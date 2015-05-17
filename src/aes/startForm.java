@@ -1,12 +1,12 @@
 package aes;
 
 import aes.Case;
-import aes.CaseFactory;
+import aes.inaktuellt.CaseFactory;
 import aes.Enums.PersonalInstallation;
 import aes.Enums.PersonalNetwork;
 import aes.Enums.PersonalSecurity;
 import aes.Enums.PersonalUsers;
-import aes.ListManager;
+import aes.inaktuellt.ListManager;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 
