@@ -22,7 +22,6 @@ public class Case
     private String bestallareAnvNamn;
     private String kategori;
     private String status;
-    private String arbetsBesk;
     private String skapadAv;
     private String tilldeladTill;
     private Date skapad;
@@ -32,7 +31,7 @@ public class Case
     private int beraknadTid;
     private int tidsAtgang;
     private String caseDesc;
-    private String losning;
+    private String solution;
     private String titel;
     private String comments;
     
@@ -250,12 +249,12 @@ public class Case
                 throw new SQLException("Uppkoppling mot databas saknas");
             }
             
-            PreparedStatement caseStmt = cn.prepareStatement("INSERT INTO CASES (TITEL, DESCRIPTION, SKAPATDEN, ANDRATDEN, STATUS, SKAPATAV, REQUESTERFULLNAME, REQUESTERUSERNAME, PHONENR, COMPUTERNAME, TIDBEREKNAD)" 
-                  +  "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            PreparedStatement caseStmt = cn.prepareStatement("INSERT INTO CASES (TITEL, DESCRIPTION, SKAPATDEN, ANDRATDEN, STATUS, SKAPATAV, REQUESTERFULLNAME, REQUESTERUSERNAME, PHONENR, COMPUTERNAME, TIDBEREKNAD, STATUS)" 
+                  +  "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             
             PreparedStatement commentStmt = cn.prepareStatement("INSERT INTO COMMENTS(COMMENTS)" + "VALUES (?)");
             
-            //stmt.setString(1, "Case" + getId());
+            
             caseStmt.setString(1, getTitel());
             caseStmt.setString(2, getCaseDesc());
             caseStmt.setTimestamp(3, sqlStartDate);
@@ -267,7 +266,12 @@ public class Case
             caseStmt.setString(9, getPhoneNR());
             caseStmt.setString(10, getCompName());
             caseStmt.setInt(11, getBeraknadTid());
-            commentStmt.setString(1, getComments());
+            caseStmt.setString(12, getStatus());
+            
+            
+            if (!getComments().isEmpty())
+                commentStmt.setString(1, getComments());
+            
             
             
             int x = commentStmt.executeUpdate();
@@ -380,6 +384,22 @@ public class Case
     public void setAndrad(Date andrad)
     {
         this.andrad = andrad;
+    }
+
+    /**
+     * @return the solution
+     */
+    public String getSolution()
+    {
+        return solution;
+    }
+
+    /**
+     * @param solution the solution to set
+     */
+    public void setSolution(String solution)
+    {
+        this.solution = solution;
     }
     
 }

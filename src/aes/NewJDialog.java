@@ -72,6 +72,8 @@ public class NewJDialog extends javax.swing.JDialog
         txtUserName.setText(null);
         comboCategory.setModel(new DefaultComboBoxModel<>(Kompetens.values()));
         comboStatus.setModel(new DefaultComboBoxModel<>(Status.values()));
+        
+        updateAssignedList();
     }
         
 
@@ -609,6 +611,22 @@ public class NewJDialog extends javax.swing.JDialog
 
     private void comboCategoryItemStateChanged(java.awt.event.ItemEvent evt)//GEN-FIRST:event_comboCategoryItemStateChanged
     {//GEN-HEADEREND:event_comboCategoryItemStateChanged
+        updateAssignedList();
+    }//GEN-LAST:event_comboCategoryItemStateChanged
+
+    private void btnSaveCaseActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnSaveCaseActionPerformed
+    {//GEN-HEADEREND:event_btnSaveCaseActionPerformed
+        saveCase();
+        dispose();
+    }//GEN-LAST:event_btnSaveCaseActionPerformed
+
+    private void btnCloseCaseWindowActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnCloseCaseWindowActionPerformed
+    {//GEN-HEADEREND:event_btnCloseCaseWindowActionPerformed
+       dispose();
+    }//GEN-LAST:event_btnCloseCaseWindowActionPerformed
+    
+    private void updateAssignedList()
+    {
         String selected = comboCategory.getSelectedItem().toString();
 
         switch(selected)
@@ -626,19 +644,8 @@ public class NewJDialog extends javax.swing.JDialog
             comboAssigned.setModel(new DefaultComboBoxModel<>(PersonalUsers.values()));
             break;
         } //End
-    }//GEN-LAST:event_comboCategoryItemStateChanged
-
-    private void btnSaveCaseActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnSaveCaseActionPerformed
-    {//GEN-HEADEREND:event_btnSaveCaseActionPerformed
-        saveCase();
-        dispose();
-    }//GEN-LAST:event_btnSaveCaseActionPerformed
-
-    private void btnCloseCaseWindowActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnCloseCaseWindowActionPerformed
-    {//GEN-HEADEREND:event_btnCloseCaseWindowActionPerformed
-       dispose();
-    }//GEN-LAST:event_btnCloseCaseWindowActionPerformed
-
+    }
+    
         //Metom som körs när användaren klickat på save case
     private void saveCase()
     {
@@ -657,6 +664,10 @@ public class NewJDialog extends javax.swing.JDialog
                 {
                     caset = new Case();
                     String temptTid = txtFieldprelTime.getText();
+                    if(temptTid.isEmpty())
+                    {
+                        temptTid = "0";
+                    }
                     int tid = Integer.parseInt(temptTid);
 
 
@@ -676,6 +687,8 @@ public class NewJDialog extends javax.swing.JDialog
                     caset.setPhoneNR(phoneNr);
                     caset.setCompName(txtComputerName.getText());
                     caset.setBeraknadTid(tid);
+                    caset.setStatus(comboStatus.getSelectedItem().toString());
+                    caset.setComments(txtComments.getText());
 
                     try
                     {
