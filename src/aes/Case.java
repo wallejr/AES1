@@ -249,7 +249,76 @@ public class Case
                 throw new SQLException("Uppkoppling mot databas saknas");
             }
             
-            PreparedStatement caseStmt = cn.prepareStatement("INSERT INTO CASES (TITEL, DESCRIPTION, SKAPATDEN, ANDRATDEN, STATUS, SKAPATAV, REQUESTERFULLNAME, REQUESTERUSERNAME, PHONENR, COMPUTERNAME, TIDBEREKNAD, STATUS)" 
+            PreparedStatement caseStmt = cn.prepareStatement("INSERT INTO CASES (TITEL, DESCRIPTION, SKAPATDEN, ANDRATDEN, STATUS, SKAPATAV, REQUESTERFULLNAME, REQUESTERUSERNAME, PHONENR, COMPUTERNAME, TIDBEREKNAD)" 
+                  +  "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            
+            PreparedStatement commentStmt;
+            
+            
+            caseStmt.setString(1, getTitel());
+            caseStmt.setString(2, getCaseDesc());
+            caseStmt.setTimestamp(3, sqlStartDate);
+            caseStmt.setTimestamp(4, sqlAndradDate);
+            caseStmt.setString(5, getStatus());
+            caseStmt.setString(6, getSkapadAv());
+            caseStmt.setString(7, getBestallareFullNamn());
+            caseStmt.setString(8, getBestallareAnvNamn());
+            caseStmt.setString(9, getPhoneNR());
+            caseStmt.setString(10, getCompName());
+            caseStmt.setInt(11, getBeraknadTid());
+            
+            
+            
+            if (!getComments().isEmpty())
+            {
+                commentStmt = cn.prepareStatement("INSERT INTO COMMENTS(COMMENTS)" + "VALUES (?)");
+                commentStmt.setString(1, getComments());
+                
+            }
+            
+            
+            
+            //int x = commentStmt.executeUpdate();
+            int i = caseStmt.executeUpdate();
+            
+            if (i > 0 )
+            {
+                succes = true;
+            }
+            
+            return  succes;
+            
+        } catch (ClassNotFoundException classE)
+        {
+            throw new SQLException("Problem med db:" + classE.getMessage());
+        }
+        
+        finally
+        {
+            if (cn != null)
+                cn.close();
+        }
+    } //End method addCase
+    
+        public boolean updateCase() throws SQLException
+    {
+        boolean succes = false;
+        Connection cn = null;
+        String DBURL = "jdbc:derby://localhost:1527/AES;user=wallejr;password=aik71111";
+        java.sql.Timestamp sqlStartDate = new java.sql.Timestamp(getSkapad().getTime());
+        java.sql.Timestamp sqlAndradDate = new java.sql.Timestamp(getAndrad().getTime());
+        
+        try
+        {
+            Class.forName("org.apache.derby.jdbc.ClientDriver");
+            cn = DriverManager.getConnection(DBURL);
+            
+            if (cn == null)
+            {
+                throw new SQLException("Uppkoppling mot databas saknas");
+            }
+            
+            PreparedStatement caseStmt = cn.prepareStatement("INSERT INTO CASES (TITEL, DESCRIPTION, SKAPATDEN, ANDRATDEN, STATUS, SKAPATAV, REQUESTERFULLNAME, REQUESTERUSERNAME, PHONENR, COMPUTERNAME, TIDBEREKNAD)" 
                   +  "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             
             PreparedStatement commentStmt = cn.prepareStatement("INSERT INTO COMMENTS(COMMENTS)" + "VALUES (?)");
@@ -266,7 +335,7 @@ public class Case
             caseStmt.setString(9, getPhoneNR());
             caseStmt.setString(10, getCompName());
             caseStmt.setInt(11, getBeraknadTid());
-            caseStmt.setString(12, getStatus());
+            
             
             
             if (!getComments().isEmpty())
@@ -294,7 +363,7 @@ public class Case
             if (cn != null)
                 cn.close();
         }
-    }
+    } //End method updateCase
     
         
     public static java.sql.Date convertFromJAVADateToSQLDate(

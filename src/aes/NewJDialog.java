@@ -169,8 +169,6 @@ public class NewJDialog extends javax.swing.JDialog
 
         lblAssignedTo.setText("Assigned to:");
 
-        comboAssigned.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Not Assigned" }));
-
         lblCreated.setText("Created:");
 
         txtCreateDate.setEditable(false);
@@ -617,7 +615,7 @@ public class NewJDialog extends javax.swing.JDialog
     private void btnSaveCaseActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnSaveCaseActionPerformed
     {//GEN-HEADEREND:event_btnSaveCaseActionPerformed
         saveCase();
-        dispose();
+        
     }//GEN-LAST:event_btnSaveCaseActionPerformed
 
     private void btnCloseCaseWindowActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnCloseCaseWindowActionPerformed
@@ -644,20 +642,32 @@ public class NewJDialog extends javax.swing.JDialog
             comboAssigned.setModel(new DefaultComboBoxModel<>(PersonalUsers.values()));
             break;
         } //End
+        
+        comboAssigned.insertItemAt("Not Assigned", 0);
+        comboAssigned.setSelectedIndex(0);
     }
     
         //Metom som körs när användaren klickat på save case
     private void saveCase()
-    {
-        //CaseFactory ad = new CaseFactory();
+    { 
+        
+        if (lblCaseId == null)
+        {
+            
+        }
+        
         Case caset;
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Date date = new Date();
         boolean verify = false;
 
         
-        do
+//        do
+//        {
+        try
         {
+            
+        
             if (validateName())
             {
                 if (validatePhoneNr())
@@ -669,12 +679,15 @@ public class NewJDialog extends javax.swing.JDialog
                         temptTid = "0";
                     }
                     int tid = Integer.parseInt(temptTid);
+                    int selectedAssigned = comboAssigned.getSelectedIndex();
+                    
 
 
 
                     JOptionPane.showMessageDialog(null, "Hi, its correct");
+                    
 
-                    caset.addId();
+                    
                     caset.setBestallareAnvNamn(userName);
                     caset.setBestallareFullNamn(fullName);
                     caset.setCaseDesc(txtDescription.getText());
@@ -689,30 +702,60 @@ public class NewJDialog extends javax.swing.JDialog
                     caset.setBeraknadTid(tid);
                     caset.setStatus(comboStatus.getSelectedItem().toString());
                     caset.setComments(txtComments.getText());
+                    
+                   
+                    
+                    if (comboStatus.getSelectedItem().equals(Status.Assigned) && selectedAssigned == 0 )
+                    {
+                        throw new IllegalArgumentException("Please choose an assigne or change case status");
+                    }
 
                     try
                     {
-                        if (caset.addCase() == true)
+                        if (txtCaseIdNr.getText().isEmpty())
                         {
-                                   
+                            if (caset.addCase() == true)
+                            {
+
+                            }
+                            else
+                            {
+                                JOptionPane.showMessageDialog(this, "Kunde inte lägga till case");
+                            }
                         }
                         else
                         {
-                            JOptionPane.showMessageDialog(this, "Kunde inte lägga till case");
+                            if (caset.updateCase() == true)
+                            {
+
+                            }
+                            else
+                            {
+                                JOptionPane.showMessageDialog(this, "Kunde inte lägga till case");
+                            }
                         }
+                        
                     } catch (SQLException | HeadlessException ex)
                     {
                         JOptionPane.showMessageDialog(this, "FEL!" + ex.getMessage());
                     }
 
+
                     
                     verify = true;
+                    
+                    dispose();
                 
                 }
                 
                 
             }//end if Validatename
-        }while(!verify);
+        }
+        catch (IllegalArgumentException argEx)
+        {
+            JOptionPane.showMessageDialog(this, argEx.getMessage());
+        }
+        //}while(!verify);
         
         
     }//Slut på metoden saveCase
@@ -753,16 +796,19 @@ public class NewJDialog extends javax.swing.JDialog
         phoneNr = txtphone.getText();
         phoneNr = phoneNr.trim();
         
+        boolean success = false;
+        
          try
          {
              int temp = Integer.parseInt(phoneNr);
+             success = true;
          } catch (NumberFormatException numE)
          {
              JOptionPane.showMessageDialog(null, "Verify phone number.", "INPUT ERROR", JOptionPane.ERROR_MESSAGE);
-             return false;
+             success = false;
          }
          
-         return true;
+         return success;
      }
 
     
