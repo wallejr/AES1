@@ -1,12 +1,11 @@
 package aes;
 
-import aes.Case;
-import aes.inaktuellt.CaseFactory;
+
 import aes.Enums.PersonalInstallation;
 import aes.Enums.PersonalNetwork;
 import aes.Enums.PersonalSecurity;
 import aes.Enums.PersonalUsers;
-import aes.inaktuellt.ListManager;
+
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 
@@ -15,9 +14,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Vector;
-import javax.swing.JList;
+
+import net.proteanit.sql.DbUtils;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -116,10 +114,10 @@ public class startForm extends javax.swing.JFrame {
         panelSaveAndClose = new javax.swing.JPanel();
         btnSaveCase = new javax.swing.JButton();
         btnCloseCaseWindow = new javax.swing.JButton();
-        jPanel1 = new javax.swing.JPanel();
-        lblTitle = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         listCases = new javax.swing.JList();
+        jPanel1 = new javax.swing.JPanel();
+        lblTitle = new javax.swing.JLabel();
         btnSearchCat = new javax.swing.JButton();
         btnSearchID = new javax.swing.JButton();
         btnSearchAssigne = new javax.swing.JButton();
@@ -128,6 +126,8 @@ public class startForm extends javax.swing.JFrame {
         btnOpenCase = new javax.swing.JButton();
         btnReports = new javax.swing.JButton();
         btnReftresh = new javax.swing.JButton();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        tbleCases = new javax.swing.JTable();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -617,6 +617,9 @@ public class startForm extends javax.swing.JFrame {
                     .addContainerGap(599, Short.MAX_VALUE)))
         );
 
+        jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder("Open cases"));
+        jScrollPane1.setViewportView(listCases);
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Remember Case Software");
         addWindowListener(new java.awt.event.WindowAdapter()
@@ -631,9 +634,6 @@ public class startForm extends javax.swing.JFrame {
 
         lblTitle.setFont(new java.awt.Font("Microsoft Sans Serif", 1, 36)); // NOI18N
         lblTitle.setText("Remember Case Software");
-
-        jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder("Open cases"));
-        jScrollPane1.setViewportView(listCases);
 
         btnSearchCat.setText("Search by Category");
 
@@ -665,6 +665,23 @@ public class startForm extends javax.swing.JFrame {
             }
         });
 
+        jScrollPane5.setBorder(javax.swing.BorderFactory.createTitledBorder("Open Cases"));
+
+        tbleCases.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][]
+            {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String []
+            {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane5.setViewportView(tbleCases);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -682,38 +699,37 @@ public class startForm extends javax.swing.JFrame {
                 .addGap(0, 8, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnCreateCase, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnOpenCase, javax.swing.GroupLayout.Alignment.TRAILING)))
+                    .addComponent(jScrollPane5)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(95, 95, 95)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(btnReftresh)
-                            .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 443, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 443, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(btnReftresh)
+                        .addGap(93, 93, 93)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnCreateCase, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnOpenCase, javax.swing.GroupLayout.Alignment.TRAILING))))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(28, 28, 28)
+                .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnCreateCase)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGap(2, 2, 2)
                         .addComponent(btnOpenCase)
-                        .addGap(40, 40, 40))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnCreateCase))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(28, 28, 28)
-                        .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 85, Short.MAX_VALUE)
-                        .addComponent(btnReftresh)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(32, 32, 32)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnReftresh)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 391, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnSearchCat)
                     .addComponent(btnSearchID)
@@ -759,7 +775,7 @@ public class startForm extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addGap(42, 42, 42))
         );
 
         pack();
@@ -785,24 +801,37 @@ public class startForm extends javax.swing.JFrame {
     
     private void updateList()
     {
-        Connection cn = null;
+        
+        DefaultListModel m = new DefaultListModel();
+        
+        Connection conn = null;
+        ResultSet rs = null;
+        PreparedStatement pst = null;
         String DBURL = "jdbc:derby://localhost:1527/AES;user=wallejr;password=aik71111";
+        
+        
         
         try
         {
             Class.forName("org.apache.derby.jdbc.ClientDriver");
-            cn = DriverManager.getConnection(DBURL);
-            Statement newStat = cn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            ResultSet res = newStat.executeQuery("select * from WALLEJR.CASES");
-
-            Vector<String> caseList = new Vector<String>();
-            while (res.next()) 
-            {
-                caseList.add(res.getString("TITEL"));
-            }
-            listCases = new JList(caseList);
-            newStat.close();
-            cn.close();
+            conn = DriverManager.getConnection(DBURL);
+            
+            String sql = "select * from WALLEJR.CASES";
+            pst = conn.prepareStatement(sql);
+            rs = pst.executeQuery();
+            tbleCases.setModel(DbUtils.resultSetToTableModel(rs));
+            
+            
+//            while (rs.next()) 
+//            {
+//                int caseID = rs.getInt("CASEID");
+//                String titel = rs.getString("TITEL");
+//                m.addElement(caseID);
+//                m.addElement(titel);
+//            }
+//            listCases.setModel(m);
+            conn.close();
+            
 
         }
         catch(SQLException e)
@@ -932,6 +961,7 @@ public class startForm extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JLabel lblAssignedTo;
     private javax.swing.JLabel lblCaseId;
@@ -962,6 +992,7 @@ public class startForm extends javax.swing.JFrame {
     private javax.swing.JPanel panelSolution1;
     private javax.swing.JPanel panelTimeInfo;
     private javax.swing.JPanel panelWorkTask;
+    private javax.swing.JTable tbleCases;
     private javax.swing.JTextField txtCaseIdNr;
     private javax.swing.JTextArea txtComments;
     private javax.swing.JTextField txtComputerName;
