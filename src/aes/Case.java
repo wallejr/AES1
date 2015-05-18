@@ -250,7 +250,7 @@ public class Case
             }
             
             PreparedStatement caseStmt = cn.prepareStatement("INSERT INTO CASES (TITEL, DESCRIPTION, SKAPATDEN, ANDRATDEN, STATUS, SKAPATAV, REQUESTERFULLNAME, REQUESTERUSERNAME, PHONENR, COMPUTERNAME, TIDBEREKNAD)" 
-                  +  "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                  +  "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             
             PreparedStatement commentStmt;
             
@@ -266,6 +266,7 @@ public class Case
             caseStmt.setString(9, getPhoneNR());
             caseStmt.setString(10, getCompName());
             caseStmt.setInt(11, getBeraknadTid());
+            caseStmt.setString(12, getTilldeladTill());
             
             
             
@@ -318,7 +319,7 @@ public class Case
                 throw new SQLException("Uppkoppling mot databas saknas");
             }
             
-            PreparedStatement caseStmt = cn.prepareStatement("INSERT INTO CASES (TITEL, DESCRIPTION, SKAPATDEN, ANDRATDEN, STATUS, SKAPATAV, REQUESTERFULLNAME, REQUESTERUSERNAME, PHONENR, COMPUTERNAME, TIDBEREKNAD)" 
+            PreparedStatement caseStmt = cn.prepareStatement("INSERT INTO CASES (TITEL, DESCRIPTION, SKAPATDEN, ANDRATDEN, STATUS, SKAPATAV, REQUESTERFULLNAME, REQUESTERUSERNAME, PHONENR, COMPUTERNAME, TIDBEREKNAD, ASSIGNE)" 
                   +  "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             
             PreparedStatement commentStmt = cn.prepareStatement("INSERT INTO COMMENTS(COMMENTS)" + "VALUES (?)");
