@@ -835,16 +835,17 @@ public class startForm extends javax.swing.JFrame {
         Connection conn = null;
         ResultSet rs = null;
         PreparedStatement pst = null;
-        String DBURL = "jdbc:derby://localhost:1527/AES;user=wallejr;password=aik71111";
+        String DBURL = "jdbc:mysql://localhost:3306/AES?" +
+                "user=root&password=aik71111";
         
         
         
         try
         {
-            Class.forName("org.apache.derby.jdbc.ClientDriver");
+            Class.forName("com.mysql.jdbc.Driver");
             conn = DriverManager.getConnection(DBURL);
             
-            String sql = "select CASEID as \"CaseID\", TITEL as \"Titel\", DESCRIPTION as \"Description\", SKAPATDEN as \"Created\", ANDRATDEN as \"Changed\", STATUS as \"Status\", ASSIGNE as \"Assigned\" from WALLEJR.CASES where STATUS='Opened'";
+            String sql = "select CASES_ID as \"CaseID\", TITEL as \"Titel\", DESCRIPTION as \"Description\", SKAPATDEN as \"Created\", ANDRATDEN as \"Changed\", STATUS as \"Status\", ASSIGNE as \"Assigned\" from AES.CASES where STATUS='Opened'";
             pst = conn.prepareStatement(sql);
             rs = pst.executeQuery();
             tbleCases.setModel(DbUtils.resultSetToTableModel(rs));

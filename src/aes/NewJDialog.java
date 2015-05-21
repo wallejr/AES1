@@ -614,7 +614,15 @@ public class NewJDialog extends javax.swing.JDialog
 
     private void btnSaveCaseActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnSaveCaseActionPerformed
     {//GEN-HEADEREND:event_btnSaveCaseActionPerformed
-        saveCase();
+        if (txtCaseIdNr.getText().isEmpty())
+        {
+           saveNewCase(); 
+        }
+        else
+        {
+            saveUpdateCase();
+        }
+        
         
     }//GEN-LAST:event_btnSaveCaseActionPerformed
 
@@ -648,11 +656,11 @@ public class NewJDialog extends javax.swing.JDialog
     }
     
         //Metom som körs när användaren klickat på save case
-    private void saveCase()
+    private void saveNewCase()
     { 
         
         Case caset;
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        //DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Date date = new Date();
         boolean verify = false;
 
@@ -704,44 +712,32 @@ public class NewJDialog extends javax.swing.JDialog
 
                     try
                     {
-                        if (txtCaseIdNr.getText().isEmpty())
+                        
+                        if (txtFieldCreatedBy.getText().isEmpty())
                         {
-                            if (txtFieldCreatedBy.getText().isEmpty())
-                            {
-                                throw new IllegalArgumentException("Please enter who has created the case");
-                            }
-                            else
-                            {
-                                if (caset.addCase() == true)
-                                {
-
-                                }
-                                else
-                                {
-                                    JOptionPane.showMessageDialog(this, "Kunde inte lägga till case");
-                                }
-                            } //End inner if else verify textFieldCreatedBy
-                        } //En outer if txtcaseidnr is empty
+                            throw new IllegalArgumentException("Please enter who has created the case");
+                        }
                         else
                         {
-                            if (caset.updateCase() == true)
+                            if (caset.addCase() == true)
                             {
 
                             }
                             else
                             {
-                                JOptionPane.showMessageDialog(this, "Kunde inte lägga till case");
+                                throw new SQLException();
                             }
-                        }
+                        } //End inner if else verify textFieldCreatedBy
                         
-                    } catch (SQLException | HeadlessException ex)
+                    } 
+                    catch (SQLException | HeadlessException ex)
                     {
                         JOptionPane.showMessageDialog(this, "FEL!\n" + ex.getMessage());
                     }
 
 
                     
-                    verify = true;
+                    //verify = true;
                     
                     dispose();
                 
@@ -758,6 +754,22 @@ public class NewJDialog extends javax.swing.JDialog
         
         
     }//Slut på metoden saveCase
+    
+    private void saveUpdateCase()
+    {
+        Case caset;
+        
+        try
+        {
+            caset = new Case();
+            
+            
+            
+        } catch (Exception e)
+        {
+        }
+        
+    }
 
     
  
@@ -795,7 +807,7 @@ public class NewJDialog extends javax.swing.JDialog
         phoneNr = txtphone.getText();
         phoneNr = phoneNr.trim();
         
-        boolean success = false;
+        boolean success;
         
          try
          {

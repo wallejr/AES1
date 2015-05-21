@@ -286,7 +286,7 @@ public class Case
         
     
                     
-                    commentStmt = cn.prepareStatement("INSERT INTO CASE_COMMENTS(COMMENTS, Timed)" + "VALUES (?, ?)");
+                    commentStmt = cn.prepareStatement("INSERT INTO CASE_COMMENTS(COMMENTS, Timed, CASE_ID)" + "VALUES (?, ?, LAST_INSERT_ID())");
                     commentStmt.setString(1, getComments());
                     commentStmt.setTimestamp(2, sqlAndradDate);
 
