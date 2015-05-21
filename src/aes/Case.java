@@ -43,21 +43,7 @@ public class Case
     {  
     }
     
-    public Case(String bestFull, String bestnANamn, String kat, String stat, String skapadav, String tilldelad,
-            int bertid, String casedesc, String tit)
-    {
-        setBestallareAnvNamn(bestnANamn);
-        setBestallareFullNamn(bestFull);
-        setKategori(kat);
-        setStatus(stat);
-        setSkapadAv(skapadav);
-        setTilldeladTill(tilldelad);
-        setBeraknadTid(bertid);
-        setCaseDesc(casedesc);
-        setTitel(tit);
-        
-        
-    }
+    
 
 
 
@@ -365,8 +351,10 @@ public class Case
                 throw new SQLException("Uppkoppling mot databas saknas");
             }
             
-            PreparedStatement caseStmt = cn.prepareStatement("INSERT INTO CASES (TITEL, DESCRIPTION, SKAPATDEN, ANDRATDEN, STATUS, SKAPATAV, REQUESTERFULLNAME, REQUESTERUSERNAME, PHONENR, COMPUTERNAME, TIDBEREKNAD, ASSIGNE, DEPARTMENT)" 
-                  +  "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            PreparedStatement caseStmt = cn.prepareStatement("INSERT INTO CASES (TITEL, DESCRIPTION, SKAPATDEN, ANDRATDEN, STATUS, " + 
+                    "SKAPATAV, REQUESTERFULLNAME, REQUESTERUSERNAME, PHONENR, COMPUTERNAME, " + 
+                    "TIDBEREKNAD, ASSIGNE, DEPARTMENT, KATEGORI) " +
+                   "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             
             PreparedStatement commentStmt;
             
@@ -384,6 +372,7 @@ public class Case
             caseStmt.setInt(11, getBeraknadTid());
             caseStmt.setString(12, getTilldeladTill());
             caseStmt.setString(13, getAvdelning());
+            caseStmt.setString(14, getKategori());
             
             
             
@@ -410,7 +399,11 @@ public class Case
 
                 }
                 else
+                {
                     succes = false;
+                }
+                
+                succes = true;
             }
             
             //return  succes;
@@ -431,17 +424,20 @@ public class Case
         
     } //End method addCase
     
-        public boolean updateCase() throws SQLException
+        public boolean updateCase() throws SQLException, Exception
     {
         boolean succes = false;
         Connection cn = null;
-        String DBURL = "jdbc:derby://localhost:1527/AES;user=wallejr;password=aik71111";
-//        Timestamp sqlStartDate = new Timestamp(getSkapad().getTime());
-        Timestamp sqlAndradDate = new Timestamp(getAndrad().getTime());
+        String DBURL = "jdbc:mysql://localhost:3306/AES?" +
+        "user=root&password=aik71111";
+
         
         try
         {
-            Class.forName("org.apache.derby.jdbc.ClientDriver");
+            Timestamp sqlStartDate = new Timestamp(getSkapad().getTime());
+            Timestamp sqlAndradDate = new Timestamp(getAndrad().getTime());
+            
+            Class.forName("com.mysql.jdbc.Driver");
             cn = DriverManager.getConnection(DBURL);
             
             if (cn == null)
@@ -449,52 +445,81 @@ public class Case
                 throw new SQLException("Uppkoppling mot databas saknas");
             }
             
-            PreparedStatement caseStmt = cn.prepareStatement("UPDATE CASES SET" +
+            PreparedStatement caseStmt = cn.prepareStatement("UPDATE CASES SET " +
                         "TITEL = ?, " +
                         "DESCRIPTION = ?," +
                         "ANDRATDEN = ?," +
                         "STATUS = ?," +
                         "PHONENR = ?," +
                         "COMPUTERNAME = ?," +
-                        "TIDBEREKNAD = ?,");
+                        "TIDBEREKNAD = ?," + 
+                        "ASSIGNE = ?," +
+                        "DEPARTMENT = ?, " +
+                        "TIDSLUTFORT = ?, " +
+                        "KATEGORI = ? " +
+                        "where CASES_ID='"+getId()+"'");
                         
-                  
-            PreparedStatement solutionStmt = cn.prepareStatement("INSERT INTO CASE_SOLUTIONS(SOLUTIONS)");
-            PreparedStatement commentStmt = cn.prepareStatement("INSERT INTO COMMENTS(COMMENTS, CASEID_FK)" + "VALUES (?)");
-            
             
             caseStmt.setString(1, getTitel());
             caseStmt.setString(2, getCaseDesc());
-            caseStmt.setTimestamp(4, sqlAndradDate);
-            caseStmt.setString(5, getStatus());
-            caseStmt.setString(6, getSkapadAv());
-            caseStmt.setString(7, getBestallareFullNamn());
-            caseStmt.setString(8, getBestallareAnvNamn());
-            caseStmt.setString(9, getPhoneNR());
-            caseStmt.setString(10, getCompName());
-            caseStmt.setInt(11, getBeraknadTid());
+            caseStmt.setTimestamp(3, sqlAndradDate);
+            caseStmt.setString(4, getStatus());
+            caseStmt.setString(5, getPhoneNR());
+            caseStmt.setString(6, getCompName());
+            caseStmt.setInt(7, getBeraknadTid());
+            caseStmt.setString(8, getTilldeladTill());
+            caseStmt.setString(9, getAvdelning());
+            caseStmt.setInt(10, getTidsAtgang());
+            caseStmt.setString(11, getKategori());
+          
             
-            
-            
-            if (!getComments().isEmpty())
-                commentStmt.setString(1, getComments());
-            
-            
-            
-            int x = commentStmt.executeUpdate();
             int i = caseStmt.executeUpdate();
             
-            if (i > 0 || x > 0)
+            if (i > 0 )
             {
+                if (getComments() != null && !getComments().isEmpty())
+                {
+                   
+                    PreparedStatement commentStmt = cn.prepareStatement("INSERT INTO CASE_COMMENTS(COMMENTS, Timed, CASE_ID)" + "VALUES (?, ?, '"+getId()+"'");
+                    commentStmt.setString(1, getComments());
+                    commentStmt.setTimestamp(2, sqlAndradDate);
+
+
+                    int x = commentStmt.executeUpdate();
+                    if (x > 0)
+                    {
+                        succes = true;
+                    } //End inner, inner if, verifying comments insert success
+
+                }//End inner if, runningt comments insert statement
+                
+                if(getSolution() != null && !getSolution().isEmpty())
+                {
+                    PreparedStatement solutionStmt = cn.prepareStatement("INSERT INTO CASE_SOLUTIONS(SOLUTION, Timed, CASE_ID)" + "VALUES(?, ?, '"+getId()+"'");
+                    solutionStmt.setString(1, getSolution());
+                    solutionStmt.setTimestamp(2, sqlStartDate);
+                    
+                    int x = solutionStmt.executeUpdate();
+                    if (x > 0)
+                    {
+                        succes = true;
+                    } //End inner, inner if, verifying solution insert success
+                }
+                
+                
                 succes = true;
-            }
-            
+            }//End outer if verifyt case update
             
             
         } catch (ClassNotFoundException classE)
         {
             throw new SQLException("Problem med db:" + classE.getMessage());
         }
+        catch(NullPointerException nullE)
+        {
+            throw new NullPointerException(nullE.getMessage());
+        }
+                
         
         finally
         {
@@ -508,6 +533,8 @@ public class Case
     
     public boolean openCase() throws SQLException
     {
+        
+        
         boolean success = false;
         Connection cn = null;
         String DBURL = "jdbc:mysql://localhost:3306/AES?" +
@@ -516,7 +543,7 @@ public class Case
 //        Timestamp sqlStartDate = new Timestamp(getSkapad().getTime());
         try
         {
-            Class.forName("org.apache.derby.jdbc.ClientDriver");
+            Class.forName("com.mysql.jdbc.Driver");
             cn = DriverManager.getConnection(DBURL);
             String s ="select * from CASES where CASES_ID='"+getId()+"'";
             Statement stmt = cn.createStatement();
@@ -537,6 +564,9 @@ public class Case
                 setTidsAtgang(rs.getInt("TIDSLUTFORT"));
                 setTilldeladTill(rs.getString("ASSIGNE"));
                 setSolution(rs.getString("SOLUTION"));
+                setAvdelning(rs.getString("DEPARTMENT"));
+                setTidsAtgang(rs.getInt("TIDSLUTFORT"));
+                setKategori(rs.getString("KATEGORI"));
             }
             
             success = true;

@@ -35,6 +35,7 @@ public class NewJDialog extends javax.swing.JDialog
     private String avdelning;
     private String phoneNr;
     private int caseID;
+    private Case caset;
     
     
     /**
@@ -66,7 +67,6 @@ public class NewJDialog extends javax.swing.JDialog
         txtCreateDate.setText(null);
         txtDescription.setText(null);
         txtFieldCreatedBy.setText(null);
-        txtFieldprelTime.setText(null);
         txtFullName.setText(null);
         txtphone.setText(null);
         txtsolution.setText(null);
@@ -451,14 +451,14 @@ public class NewJDialog extends javax.swing.JDialog
         lblprefTime.setText("Prefer time taken:");
 
         txtFieldprelTime.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txtFieldprelTime.setText("3");
+        txtFieldprelTime.setText("0");
 
         lblPrefhours.setText("hours");
 
         lblTimeTaken.setText("Time taken:");
 
-        txtFieldTimeTaken.setHorizontalAlignment(javax.swing.JTextField.LEFT);
-        txtFieldTimeTaken.setText(" Enter total time when closed");
+        txtFieldTimeTaken.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        txtFieldTimeTaken.setText("0");
 
         lblTakenHours.setText("hours");
 
@@ -662,7 +662,7 @@ public class NewJDialog extends javax.swing.JDialog
     private void saveNewCase()
     { 
         
-        Case caset;
+        caset = new Case();
         //DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Date date = new Date();
         boolean verify = false;
@@ -675,13 +675,8 @@ public class NewJDialog extends javax.swing.JDialog
             {
                 if (validatePhoneNr())
                 {
-                    caset = new Case();
-                    String temptTid = txtFieldprelTime.getText();
-                    if(temptTid.isEmpty())
-                    {
-                        temptTid = "0";
-                    }
-                    int tid = Integer.parseInt(temptTid);
+                    
+                    
                     int selectedAssigned = comboAssigned.getSelectedIndex();
                     
 
@@ -702,10 +697,11 @@ public class NewJDialog extends javax.swing.JDialog
                     caset.setSkapadAv(txtFieldCreatedBy.getText());
                     caset.setPhoneNR(phoneNr);
                     caset.setCompName(txtComputerName.getText());
-                    caset.setBeraknadTid(tid);
+                    caset.setBeraknadTid(Integer.parseInt(txtFieldprelTime.getText()));
                     caset.setStatus(comboStatus.getSelectedItem().toString());
                     caset.setComments(txtComments.getText());
                     caset.setAvdelning(txtFieldAvd.getText());
+                    caset.setTidsAtgang(Integer.parseInt(txtFieldTimeTaken.getText()));
                     
                    
                     
@@ -748,12 +744,15 @@ public class NewJDialog extends javax.swing.JDialog
                     
                     //verify = true;
                     
+                    
                     dispose();
-                
                 }
+              
                 
                 
             }//end if Validatename
+            
+           
         }
         catch (IllegalArgumentException argEx)
         {
@@ -761,35 +760,46 @@ public class NewJDialog extends javax.swing.JDialog
         }
         //}while(!verify);
         
+         
+        
+        
         
     }//Slut på metoden saveCase
     
     private void saveUpdateCase()
     {
-        Case caset;
+        
+        Date date = new Date();
         
         try
         {
-            if (comboStatus.getSelectedItem().equals(Status.Closed) && txtsolution.getText().isEmpty() && txtFieldTimeTaken.getText().isEmpty())
+             if (validateName())
             {
-                throw new IllegalArgumentException("Please enter a solution and time taken");
+                if (validatePhoneNr())
+                {
+                    if (comboStatus.getSelectedItem().equals(Status.Closed) && txtsolution.getText().isEmpty() && txtFieldTimeTaken.getText().isEmpty())
+                    {
+                        throw new IllegalArgumentException("Please enter a solution and time taken");
+                    }
+                    else
+                    {
+                        
+                        caset.setId(Integer.parseInt(txtCaseIdNr.getText()));
+                        caset.setSkapad(date);
+                        caset.setAndrad(date);
+                        caset.updateCase();
+                        
+                        dispose();
+                    }
+                }
             }
-            else
-            {
-                caset = new Case();
-                caset.setId(Integer.parseInt(txtCaseIdNr.getText()));
-                caset.updateCase();
-                
-            }
-            
-            
-            
             
             
         } catch (Exception e)
         {
             JOptionPane.showMessageDialog(this, e.getMessage());
         }
+        
         
     }
 
@@ -848,14 +858,14 @@ public class NewJDialog extends javax.swing.JDialog
      {
          try
          {
-            Case caset = new Case();
+            caset = new Case();
             caset.setId(getCaseID());
           
             caset.openCase();
             txtCaseIdNr.setText(Integer.toString(getCaseID()));
             txtTitle.setText(caset.getTitel());
             txtDescription.setText(caset.getCaseDesc());
-            comboStatus.setSelectedItem(caset.getStatus());
+            comboStatus.setSelectedItem(Status.valueOf(caset.getStatus()));
             txtFieldCreatedBy.setText(caset.getSkapadAv());
             txtFullName.setText(caset.getBestallareFullNamn());
             txtUserName.setText(caset.getBestallareAnvNamn());
@@ -865,6 +875,28 @@ public class NewJDialog extends javax.swing.JDialog
             txtFieldAvd.setText(caset.getAvdelning());
             txtCreateDate.setText(caset.getSkapad().toString());
             txtTimeChanged.setText(caset.getAndrad().toString());
+            comboCategory.setSelectedItem(Kompetens.valueOf(caset.getKategori()));
+            
+            Kompetens tempKomp = Kompetens.valueOf(caset.getKategori());
+            
+            switch(tempKomp)
+            {
+                case Installation:
+                    comboAssigned.setSelectedItem(PersonalInstallation.valueOf(caset.getTilldeladTill()));
+                    break;
+                case Network:
+                    comboAssigned.setSelectedItem(PersonalNetwork.valueOf(caset.getTilldeladTill()));
+                    break;
+                case Security:
+                    comboAssigned.setSelectedItem(PersonalSecurity.valueOf(caset.getTilldeladTill()));
+                    break;
+                case Users:
+                    comboAssigned.setSelectedItem(PersonalUsers.valueOf(caset.getTilldeladTill()));
+                    break;
+                
+            }
+            
+            
             
             if (comboStatus.getSelectedItem().equals(Status.Closed))
             {
