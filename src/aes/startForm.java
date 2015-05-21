@@ -937,6 +937,8 @@ public class startForm extends javax.swing.JFrame {
         
        if (tbleCases.getSelectedRow() >= 0 )
        {
+           
+           
            openCase();
        }
        else
@@ -951,10 +953,25 @@ public class startForm extends javax.swing.JFrame {
     
     private void openCase()
     {
-      
-       String getIdTemp = tbleCases.getValueAt(tbleCases.getSelectedRow(), 1).toString();
-       int getID = Integer.parseInt(getIdTemp);
-       
+        NewJDialog dia = new NewJDialog(this, rootPaneCheckingEnabled);
+        
+        
+        try
+        {
+           String objId = tbleCases.getValueAt(tbleCases.getSelectedRow(), 0).toString();
+           int id = Integer.parseInt(objId); 
+           
+           dia.setCaseID(id);
+           dia.openCase();
+           
+           dia.setVisible(true);
+           updateList();
+           
+           
+        } catch (Exception e)
+        {
+            System.err.println("SQLException: " + e.getMessage());
+        }
        
        
        

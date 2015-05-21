@@ -34,6 +34,7 @@ public class NewJDialog extends javax.swing.JDialog
     private String fullName;
     private String avdelning;
     private String phoneNr;
+    private int caseID;
     
     
     /**
@@ -45,6 +46,8 @@ public class NewJDialog extends javax.swing.JDialog
         initComponents();
         initGUI();
     }
+    
+    
 
     private NewJDialog()
     {
@@ -702,12 +705,18 @@ public class NewJDialog extends javax.swing.JDialog
                     caset.setBeraknadTid(tid);
                     caset.setStatus(comboStatus.getSelectedItem().toString());
                     caset.setComments(txtComments.getText());
+                    caset.setAvdelning(txtFieldAvd.getText());
                     
                    
                     
                     if (comboStatus.getSelectedItem().equals(Status.Assigned) && selectedAssigned == 0 )
                     {
                         throw new IllegalArgumentException("Please choose an assigne or change case status");
+                        
+                    }
+                    else if (comboStatus.getSelectedItem().equals(Status.Closed) && txtsolution.getText().isEmpty() && txtFieldTimeTaken.getText().isEmpty())
+                    {
+                        throw new IllegalArgumentException("Please enter a solution");
                     }
 
                     try
@@ -761,12 +770,25 @@ public class NewJDialog extends javax.swing.JDialog
         
         try
         {
-            caset = new Case();
+            if (comboStatus.getSelectedItem().equals(Status.Closed) && txtsolution.getText().isEmpty() && txtFieldTimeTaken.getText().isEmpty())
+            {
+                throw new IllegalArgumentException("Please enter a solution and time taken");
+            }
+            else
+            {
+                caset = new Case();
+                caset.setId(Integer.parseInt(txtCaseIdNr.getText()));
+                caset.updateCase();
+                
+            }
+            
+            
             
             
             
         } catch (Exception e)
         {
+            JOptionPane.showMessageDialog(this, e.getMessage());
         }
         
     }
@@ -820,6 +842,48 @@ public class NewJDialog extends javax.swing.JDialog
          }
          
          return success;
+     }
+     
+     public void openCase()
+     {
+         try
+         {
+            Case caset = new Case();
+            caset.setId(getCaseID());
+          
+            caset.openCase();
+            txtCaseIdNr.setText(Integer.toString(getCaseID()));
+            txtTitle.setText(caset.getTitel());
+            txtDescription.setText(caset.getCaseDesc());
+            comboStatus.setSelectedItem(caset.getStatus());
+            txtFieldCreatedBy.setText(caset.getSkapadAv());
+            txtFullName.setText(caset.getBestallareFullNamn());
+            txtUserName.setText(caset.getBestallareAnvNamn());
+            txtphone.setText(caset.getPhoneNR());
+            txtComputerName.setText(caset.getCompName());
+            txtFieldprelTime.setText(Integer.toString(caset.getBeraknadTid()));
+            txtFieldAvd.setText(caset.getAvdelning());
+            txtCreateDate.setText(caset.getSkapad().toString());
+            txtTimeChanged.setText(caset.getAndrad().toString());
+            
+            if (comboStatus.getSelectedItem().equals(Status.Closed))
+            {
+                txtFieldTimeTaken.setText(Integer.toString(caset.getTidsAtgang()));
+                txtsolution.setText(caset.getSolution());
+            }
+            
+            
+            
+            
+            
+         } 
+         catch (Exception e)
+         {
+             JOptionPane.showMessageDialog(this, e.getMessage());
+         }
+         
+         
+         
      }
 
     
@@ -932,4 +996,20 @@ public class NewJDialog extends javax.swing.JDialog
     private javax.swing.JTextArea txtsolution;
     private javax.swing.JScrollPane workTaskList;
     // End of variables declaration//GEN-END:variables
+
+    /**
+     * @return the caseID
+     */
+    public int getCaseID()
+    {
+        return caseID;
+    }
+
+    /**
+     * @param caseID the caseID to set
+     */
+    public void setCaseID(int caseID)
+    {
+        this.caseID = caseID;
+    }
 }
