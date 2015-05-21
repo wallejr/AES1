@@ -651,19 +651,11 @@ public class NewJDialog extends javax.swing.JDialog
     private void saveCase()
     { 
         
-        if (lblCaseId == null)
-        {
-            
-        }
-        
         Case caset;
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Date date = new Date();
         boolean verify = false;
 
-        
-//        do
-//        {
         try
         {
             
@@ -714,15 +706,22 @@ public class NewJDialog extends javax.swing.JDialog
                     {
                         if (txtCaseIdNr.getText().isEmpty())
                         {
-                            if (caset.addCase() == true)
+                            if (txtFieldCreatedBy.getText().isEmpty())
                             {
-
+                                throw new IllegalArgumentException("Please enter who has created the case");
                             }
                             else
                             {
-                                JOptionPane.showMessageDialog(this, "Kunde inte lägga till case");
-                            }
-                        }
+                                if (caset.addCase() == true)
+                                {
+
+                                }
+                                else
+                                {
+                                    JOptionPane.showMessageDialog(this, "Kunde inte lägga till case");
+                                }
+                            } //End inner if else verify textFieldCreatedBy
+                        } //En outer if txtcaseidnr is empty
                         else
                         {
                             if (caset.updateCase() == true)
@@ -737,7 +736,7 @@ public class NewJDialog extends javax.swing.JDialog
                         
                     } catch (SQLException | HeadlessException ex)
                     {
-                        JOptionPane.showMessageDialog(this, "FEL!" + ex.getMessage());
+                        JOptionPane.showMessageDialog(this, "FEL!\n" + ex.getMessage());
                     }
 
 

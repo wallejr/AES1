@@ -16,6 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 
 import net.proteanit.sql.DbUtils;
 
@@ -31,7 +32,7 @@ import net.proteanit.sql.DbUtils;
  */
 public class startForm extends javax.swing.JFrame {
 
-    //private ListManager lsmngr = new ListManager();
+    
    
     DefaultListModel info = new DefaultListModel();
    
@@ -130,8 +131,6 @@ public class startForm extends javax.swing.JFrame {
         panelSaveAndClose = new javax.swing.JPanel();
         btnSaveCase = new javax.swing.JButton();
         btnCloseCaseWindow = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        listCases = new javax.swing.JList();
         jPanel1 = new javax.swing.JPanel();
         lblTitle = new javax.swing.JLabel();
         btnSearchCat = new javax.swing.JButton();
@@ -633,9 +632,6 @@ public class startForm extends javax.swing.JFrame {
                     .addContainerGap(599, Short.MAX_VALUE)))
         );
 
-        jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder("Open cases"));
-        jScrollPane1.setViewportView(listCases);
-
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Remember Case Software");
         addWindowListener(new java.awt.event.WindowAdapter()
@@ -669,6 +665,13 @@ public class startForm extends javax.swing.JFrame {
         btnSearchStatus.setText("Search by Status");
 
         btnOpenCase.setText("Open Case");
+        btnOpenCase.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                btnOpenCaseActionPerformed(evt);
+            }
+        });
 
         btnReports.setText("Reports");
 
@@ -926,6 +929,37 @@ public class startForm extends javax.swing.JFrame {
     
         
     }//GEN-LAST:event_btnReftreshActionPerformed
+
+    private void btnOpenCaseActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnOpenCaseActionPerformed
+    {//GEN-HEADEREND:event_btnOpenCaseActionPerformed
+        
+        
+       if (tbleCases.getSelectedRow() >= 0 )
+       {
+           openCase();
+       }
+       else
+       {
+           JOptionPane.showMessageDialog(this, "Please choose a case to open from the list below");
+       }
+
+
+
+
+    }//GEN-LAST:event_btnOpenCaseActionPerformed
+    
+    private void openCase()
+    {
+      
+       String getIdTemp = tbleCases.getValueAt(tbleCases.getSelectedRow(), 1).toString();
+       int getID = Integer.parseInt(getIdTemp);
+       
+       
+       
+       
+    }
+    
+    
     /**
      * @param args the command line arguments
      */
@@ -984,7 +1018,6 @@ public class startForm extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
@@ -1009,7 +1042,6 @@ public class startForm extends javax.swing.JFrame {
     private javax.swing.JLabel lblTitle1;
     private javax.swing.JLabel lblUsername;
     private javax.swing.JLabel lblprefTime;
-    private javax.swing.JList listCases;
     private javax.swing.JList listWorkTask;
     private javax.swing.JPanel panelCaseProperties;
     private javax.swing.JPanel panelCaseRequest;

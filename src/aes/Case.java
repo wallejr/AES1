@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Date;
 
 /**
@@ -235,13 +236,16 @@ public class Case
     {
         boolean succes = false;
         Connection cn = null;
-        String DBURL = "jdbc:derby://localhost:1527/AES;user=wallejr;password=aik71111";
+        //String DBURL = "jdbc:derby://localhost:1527/AES;user=wallejr;password=aik71111";
+        String DBURL = "jdbc:mysql://localhost:3306/AES?" +
+                "user=root&password=aik71111";
         java.sql.Timestamp sqlStartDate = new java.sql.Timestamp(getSkapad().getTime());
         java.sql.Timestamp sqlAndradDate = new java.sql.Timestamp(getAndrad().getTime());
         
         try
         {
-            Class.forName("org.apache.derby.jdbc.ClientDriver");
+//            Class.forName("org.apache.derby.jdbc.ClientDriver");
+            Class.forName("com.mysql.jdbc.Driver");
             cn = DriverManager.getConnection(DBURL);
             
             if (cn == null)
@@ -249,7 +253,7 @@ public class Case
                 throw new SQLException("Uppkoppling mot databas saknas");
             }
             
-            PreparedStatement caseStmt = cn.prepareStatement("INSERT INTO CASES (TITEL, DESCRIPTION, SKAPATDEN, ANDRATDEN, STATUS, SKAPATAV, REQUESTERFULLNAME, REQUESTERUSERNAME, PHONENR, COMPUTERNAME, TIDBEREKNAD)" 
+            PreparedStatement caseStmt = cn.prepareStatement("INSERT INTO CASES (TITEL, DESCRIPTION, SKAPATDEN, ANDRATDEN, STATUS, SKAPATAV, REQUESTERFULLNAME, REQUESTERUSERNAME, PHONENR, COMPUTERNAME, TIDBEREKNAD, ASSIGNE)" 
                   +  "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             
             PreparedStatement commentStmt;
@@ -270,21 +274,30 @@ public class Case
             
             
             
-            if (!getComments().isEmpty())
-            {
-                commentStmt = cn.prepareStatement("INSERT INTO COMMENTS(COMMENTS)" + "VALUES (?)");
-                commentStmt.setString(1, getComments());
-                
-            }
-            
-            
-            
-            //int x = commentStmt.executeUpdate();
             int i = caseStmt.executeUpdate();
             
             if (i > 0 )
             {
-                succes = true;
+                
+                
+                if (!getComments().isEmpty())
+                {
+                   
+        
+    
+                    
+                    commentStmt = cn.prepareStatement("INSERT INTO CASE_COMMENTS(COMMENTS, Timed)" + "VALUES (?, ?)");
+                    commentStmt.setString(1, getComments());
+                    commentStmt.setTimestamp(2, sqlAndradDate);
+
+
+                    commentStmt.executeUpdate();
+                    
+                    succes = true;
+
+                }
+                else
+                    succes = false;
             }
             
             return  succes;
@@ -299,6 +312,8 @@ public class Case
             if (cn != null)
                 cn.close();
         }
+        
+        
     } //End method addCase
     
         public boolean updateCase() throws SQLException
@@ -306,8 +321,8 @@ public class Case
         boolean succes = false;
         Connection cn = null;
         String DBURL = "jdbc:derby://localhost:1527/AES;user=wallejr;password=aik71111";
-        java.sql.Timestamp sqlStartDate = new java.sql.Timestamp(getSkapad().getTime());
-        java.sql.Timestamp sqlAndradDate = new java.sql.Timestamp(getAndrad().getTime());
+        Timestamp sqlStartDate = new Timestamp(getSkapad().getTime());
+        Timestamp sqlAndradDate = new Timestamp(getAndrad().getTime());
         
         try
         {
@@ -319,10 +334,18 @@ public class Case
                 throw new SQLException("Uppkoppling mot databas saknas");
             }
             
-            PreparedStatement caseStmt = cn.prepareStatement("INSERT INTO CASES (TITEL, DESCRIPTION, SKAPATDEN, ANDRATDEN, STATUS, SKAPATAV, REQUESTERFULLNAME, REQUESTERUSERNAME, PHONENR, COMPUTERNAME, TIDBEREKNAD, ASSIGNE)" 
-                  +  "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            
-            PreparedStatement commentStmt = cn.prepareStatement("INSERT INTO COMMENTS(COMMENTS)" + "VALUES (?)");
+            PreparedStatement caseStmt = cn.prepareStatement("UPDATE CASES SET" +
+                        "TITEL = ?, " +
+                        "DESCRIPTION = ?," +
+                        "ANDRATDEN = ?," +
+                        "STATUS = ?," +
+                        "PHONENR = ?," +
+                        "COMPUTERNAME = ?," +
+                        "TIDBEREKNAD = ?,");
+                        
+                  
+            PreparedStatement solutionStmt = cn.prepareStatement("INSERT INTO CASE_SOLUTIONS(SOLUTIONS)");
+            PreparedStatement commentStmt = cn.prepareStatement("INSERT INTO COMMENTS(COMMENTS, CASEID_FK)" + "VALUES (?)");
             
             
             caseStmt.setString(1, getTitel());
@@ -364,6 +387,7 @@ public class Case
             if (cn != null)
                 cn.close();
         }
+        
     } //End method updateCase
     
         
