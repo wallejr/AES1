@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.Date;
+import javax.management.Query;
 
 /**
  *
@@ -356,7 +357,7 @@ public class Case
                     "TIDBEREKNAD, ASSIGNE, DEPARTMENT, KATEGORI) " +
                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             
-            PreparedStatement commentStmt;
+            
             
             
             caseStmt.setString(1, getTitel());
@@ -384,10 +385,8 @@ public class Case
                 
                 if (!getComments().isEmpty())
                 {
+                   PreparedStatement commentStmt;
                    
-        
-    
-                    
                     commentStmt = cn.prepareStatement("INSERT INTO CASE_COMMENTS(COMMENTS, Timed, CASE_ID)" + "VALUES (?, ?, LAST_INSERT_ID())");
                     commentStmt.setString(1, getComments());
                     commentStmt.setTimestamp(2, sqlAndradDate);
@@ -427,16 +426,16 @@ public class Case
         public boolean updateCase() throws SQLException, Exception
     {
         boolean succes = false;
+        String tempstring;
         Connection cn = null;
         String DBURL = "jdbc:mysql://localhost:3306/AES?" +
         "user=root&password=aik71111";
+        Timestamp sqlStartDate = new Timestamp(getSkapad().getTime());
+        Timestamp sqlAndradDate = new Timestamp(getAndrad().getTime());
 
         
         try
         {
-            Timestamp sqlStartDate = new Timestamp(getSkapad().getTime());
-            Timestamp sqlAndradDate = new Timestamp(getAndrad().getTime());
-            
             Class.forName("com.mysql.jdbc.Driver");
             cn = DriverManager.getConnection(DBURL);
             
@@ -445,19 +444,10 @@ public class Case
                 throw new SQLException("Uppkoppling mot databas saknas");
             }
             
-            PreparedStatement caseStmt = cn.prepareStatement("UPDATE CASES SET " +
-                        "TITEL = ?, " +
-                        "DESCRIPTION = ?," +
-                        "ANDRATDEN = ?," +
-                        "STATUS = ?," +
-                        "PHONENR = ?," +
-                        "COMPUTERNAME = ?," +
-                        "TIDBEREKNAD = ?," + 
-                        "ASSIGNE = ?," +
-                        "DEPARTMENT = ?, " +
-                        "TIDSLUTFORT = ?, " +
-                        "KATEGORI = ? " +
-                        "where CASES_ID='"+getId()+"'");
+            PreparedStatement caseStmt = cn.prepareStatement("update CASES set TITEL = ?, "+
+                    "DESCRIPTION = ?,ANDRATDEN = ?, STATUS = ?, PHONENR = ?, COMPUTERNAME = ?, " +
+                    "TIDBEREKNAD = ?, ASSIGNE = ?, DEPARTMENT = ?, TIDSLUTFORT = ?, KATEGORI = ? " +
+                    "where CASES_ID= '"+getId()+"'");
                         
             
             caseStmt.setString(1, getTitel());
@@ -473,11 +463,15 @@ public class Case
             caseStmt.setString(11, getKategori());
           
             
+            
             int i = caseStmt.executeUpdate();
+            caseStmt.execute();
             
             if (i > 0 )
             {
-                if (getComments() != null && !getComments().isEmpty())
+                tempstring = getComments();
+                
+                if (tempstring != null)
                 {
                    
                     PreparedStatement commentStmt = cn.prepareStatement("INSERT INTO CASE_COMMENTS(COMMENTS, Timed, CASE_ID)" + "VALUES (?, ?, '"+getId()+"'");

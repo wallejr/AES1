@@ -14,8 +14,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
+
 import javax.swing.JOptionPane;
 
 import net.proteanit.sql.DbUtils;
@@ -42,14 +41,15 @@ public class startForm extends javax.swing.JFrame {
     public startForm() 
     {
         initComponents();
-        updateGUI();
+        initTable();
         
     }
     
-    private void updateGUI()
+   
+    
+    private void initTable()
     {
-        
-        try
+         try
         {
             updateList();
             
@@ -57,14 +57,6 @@ public class startForm extends javax.swing.JFrame {
         {
             System.err.println("SQLException: " + e.getMessage());
         }
-        
-        
-        
-    }
-    
-    private void initTable()
-    {
-        //tbleCases.setColumnModel(null);
     }
 
     /**

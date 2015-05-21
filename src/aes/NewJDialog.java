@@ -785,14 +785,29 @@ public class NewJDialog extends javax.swing.JDialog
                     {
                         
                         caset.setId(Integer.parseInt(txtCaseIdNr.getText()));
-                        caset.setSkapad(date);
+                        caset.setTitel(txtTitle.getText());
+                        caset.setCaseDesc(txtDescription.getText());
                         caset.setAndrad(date);
+                        caset.setStatus(comboStatus.getSelectedItem().toString());
+                        caset.setPhoneNR(phoneNr);
+                        caset.setCompName(txtComputerName.getText());
+                        caset.setBeraknadTid(Integer.parseInt(txtFieldprelTime.getText()));
+                        caset.setTidsAtgang(Integer.parseInt(txtFieldTimeTaken.getText()));
+                        caset.setTilldeladTill(comboAssigned.getSelectedItem().toString());
+                        caset.setAvdelning(txtFieldAvd.getText());
+                        
                         caset.updateCase();
                         
-                        dispose();
+                        {
+                            dispose();
+                        }
+                        
                     }
+                    
                 }
             }
+             else
+                 throw  new Exception("There was an error");
             
             
         } catch (Exception e)
@@ -879,21 +894,25 @@ public class NewJDialog extends javax.swing.JDialog
             
             Kompetens tempKomp = Kompetens.valueOf(caset.getKategori());
             
-            switch(tempKomp)
+            if (!caset.getTilldeladTill().equals("Not Assigned"))
             {
-                case Installation:
-                    comboAssigned.setSelectedItem(PersonalInstallation.valueOf(caset.getTilldeladTill()));
-                    break;
-                case Network:
-                    comboAssigned.setSelectedItem(PersonalNetwork.valueOf(caset.getTilldeladTill()));
-                    break;
-                case Security:
-                    comboAssigned.setSelectedItem(PersonalSecurity.valueOf(caset.getTilldeladTill()));
-                    break;
-                case Users:
-                    comboAssigned.setSelectedItem(PersonalUsers.valueOf(caset.getTilldeladTill()));
-                    break;
-                
+                switch(tempKomp)
+                {
+                    case Installation:
+
+                        comboAssigned.setSelectedItem(PersonalInstallation.valueOf(caset.getTilldeladTill()));
+                        break;
+                    case Network:
+                        comboAssigned.setSelectedItem(PersonalNetwork.valueOf(caset.getTilldeladTill()));
+                        break;
+                    case Security:
+                        comboAssigned.setSelectedItem(PersonalSecurity.valueOf(caset.getTilldeladTill()));
+                        break;
+                    case Users:
+                        comboAssigned.setSelectedItem(PersonalUsers.valueOf(caset.getTilldeladTill()));
+                        break;
+
+                }
             }
             
             
