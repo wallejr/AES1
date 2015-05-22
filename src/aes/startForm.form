@@ -917,21 +917,14 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="jScrollPane5" max="32767" attributes="0"/>
                       <Group type="102" alignment="1" attributes="0">
-                          <EmptySpace min="-2" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" alignment="1" attributes="0">
+                          <EmptySpace pref="235" max="32767" attributes="0"/>
+                          <Group type="103" groupAlignment="1" attributes="0">
+                              <Group type="102" attributes="0">
                                   <Component id="btnSearchStatus" min="-2" pref="131" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" pref="67" max="-2" attributes="0"/>
-                                  <Component id="btnSearchCat" min="-2" pref="145" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" pref="62" max="-2" attributes="0"/>
-                                  <Component id="btnSearchID" min="-2" pref="135" max="-2" attributes="0"/>
-                                  <EmptySpace pref="57" max="32767" attributes="0"/>
-                                  <Component id="btnSearchAssigne" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" pref="55" max="-2" attributes="0"/>
-                                  <Component id="btnReports" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                  <Component id="btnListAllCases" min="-2" pref="139" max="-2" attributes="0"/>
                               </Group>
-                              <Group type="102" alignment="1" attributes="0">
-                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                              <Group type="102" attributes="0">
                                   <Component id="lblTitle" min="-2" pref="443" max="-2" attributes="0"/>
                                   <EmptySpace min="-2" pref="93" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
@@ -971,11 +964,8 @@
                   <Component id="jScrollPane5" pref="394" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="btnSearchCat" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="btnSearchID" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="btnSearchAssigne" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="btnSearchStatus" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="btnReports" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="btnListAllCases" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
               </Group>
@@ -991,21 +981,6 @@
             <Property name="text" type="java.lang.String" value="Remember Case Software"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JButton" name="btnSearchCat">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Search by Category"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JButton" name="btnSearchID">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Search by CaseID"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JButton" name="btnSearchAssigne">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Search By Assigne"/>
-          </Properties>
-        </Component>
         <Component class="javax.swing.JButton" name="btnCreateCase">
           <Properties>
             <Property name="text" type="java.lang.String" value="New Case"/>
@@ -1016,7 +991,7 @@
         </Component>
         <Component class="javax.swing.JButton" name="btnSearchStatus">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Search by Status"/>
+            <Property name="text" type="java.lang.String" value="Search Cases"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSearchStatusActionPerformed"/>
@@ -1030,10 +1005,13 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnOpenCaseActionPerformed"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JButton" name="btnReports">
+        <Component class="javax.swing.JButton" name="btnListAllCases">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Reports"/>
+            <Property name="text" type="java.lang.String" value="List all Cases"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnListAllCasesActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="btnReftresh">
           <Properties>

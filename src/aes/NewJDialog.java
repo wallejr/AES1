@@ -717,15 +717,19 @@ public class NewJDialog extends javax.swing.JDialog
         {
             case "Network":
             comboAssigned.setModel(new DefaultComboBoxModel<>(PersonalNetwork.values()));
+            txtFieldprelTime.setText("8");
             break;
             case "Security":
             comboAssigned.setModel(new DefaultComboBoxModel<>(PersonalSecurity.values()));
+            txtFieldprelTime.setText("12");
             break;
             case "Installation":
             comboAssigned.setModel(new DefaultComboBoxModel<>(PersonalInstallation.values()));
+            txtFieldprelTime.setText("4");
             break;
             case "Users":
             comboAssigned.setModel(new DefaultComboBoxModel<>(PersonalUsers.values()));
+            txtFieldprelTime.setText("2");
             break;
         } //End switch
         

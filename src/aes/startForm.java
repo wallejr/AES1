@@ -33,7 +33,6 @@ public class startForm extends javax.swing.JFrame {
 
     
    
-    DefaultListModel info = new DefaultListModel();
    
     /**
      * Creates new form startForm
@@ -42,6 +41,7 @@ public class startForm extends javax.swing.JFrame {
     {
         initComponents();
         initTable();
+        setLocationRelativeTo(null);
         
     }
     
@@ -125,13 +125,10 @@ public class startForm extends javax.swing.JFrame {
         btnCloseCaseWindow = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         lblTitle = new javax.swing.JLabel();
-        btnSearchCat = new javax.swing.JButton();
-        btnSearchID = new javax.swing.JButton();
-        btnSearchAssigne = new javax.swing.JButton();
         btnCreateCase = new javax.swing.JButton();
         btnSearchStatus = new javax.swing.JButton();
         btnOpenCase = new javax.swing.JButton();
-        btnReports = new javax.swing.JButton();
+        btnListAllCases = new javax.swing.JButton();
         btnReftresh = new javax.swing.JButton();
         jScrollPane5 = new javax.swing.JScrollPane();
         tbleCases = new javax.swing.JTable();
@@ -639,12 +636,6 @@ public class startForm extends javax.swing.JFrame {
         lblTitle.setFont(new java.awt.Font("Microsoft Sans Serif", 1, 36)); // NOI18N
         lblTitle.setText("Remember Case Software");
 
-        btnSearchCat.setText("Search by Category");
-
-        btnSearchID.setText("Search by CaseID");
-
-        btnSearchAssigne.setText("Search By Assigne");
-
         btnCreateCase.setText("New Case");
         btnCreateCase.addActionListener(new java.awt.event.ActionListener()
         {
@@ -654,7 +645,7 @@ public class startForm extends javax.swing.JFrame {
             }
         });
 
-        btnSearchStatus.setText("Search by Status");
+        btnSearchStatus.setText("Search Cases");
         btnSearchStatus.addActionListener(new java.awt.event.ActionListener()
         {
             public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -672,7 +663,14 @@ public class startForm extends javax.swing.JFrame {
             }
         });
 
-        btnReports.setText("Reports");
+        btnListAllCases.setText("List all Cases");
+        btnListAllCases.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                btnListAllCasesActionPerformed(evt);
+            }
+        });
 
         btnReftresh.setIcon(new javax.swing.ImageIcon(getClass().getResource("/aes/images/Refresh.png"))); // NOI18N
         btnReftresh.addActionListener(new java.awt.event.ActionListener()
@@ -708,20 +706,13 @@ public class startForm extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane5)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addContainerGap(235, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(btnSearchStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(67, 67, 67)
-                                .addComponent(btnSearchCat, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(62, 62, 62)
-                                .addComponent(btnSearchID, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 57, Short.MAX_VALUE)
-                                .addComponent(btnSearchAssigne)
-                                .addGap(55, 55, 55)
-                                .addComponent(btnReports))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnListAllCases, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 443, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(93, 93, 93)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -750,11 +741,8 @@ public class startForm extends javax.swing.JFrame {
                 .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnSearchCat)
-                    .addComponent(btnSearchID)
-                    .addComponent(btnSearchAssigne)
                     .addComponent(btnSearchStatus)
-                    .addComponent(btnReports))
+                    .addComponent(btnListAllCases))
                 .addGap(26, 26, 26))
         );
 
@@ -798,7 +786,6 @@ public class startForm extends javax.swing.JFrame {
         );
 
         pack();
-        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCreateCaseActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnCreateCaseActionPerformed
@@ -830,7 +817,6 @@ public class startForm extends javax.swing.JFrame {
     private void updateList() throws SQLException
     {
         
-       // DefaultListModel m = new DefaultListModel();
         
         Connection conn = null;
         ResultSet rs = null;
@@ -937,9 +923,29 @@ public class startForm extends javax.swing.JFrame {
 
     private void btnSearchStatusActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnSearchStatusActionPerformed
     {//GEN-HEADEREND:event_btnSearchStatusActionPerformed
-        searchByStatus status = new searchByStatus();
+        SearchCases status = new SearchCases();
         status.show();
     }//GEN-LAST:event_btnSearchStatusActionPerformed
+
+    private void btnListAllCasesActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnListAllCasesActionPerformed
+    {//GEN-HEADEREND:event_btnListAllCasesActionPerformed
+        listAllCases();// TODO add your handling code here:
+    }//GEN-LAST:event_btnListAllCasesActionPerformed
+    
+    private void listAllCases()
+    {
+        try
+        {
+            ShowAesLista showCases = new ShowAesLista();
+            showCases.openAllCases();
+            showCases.setVisible(true);
+        } catch (Exception e)
+        {
+            JOptionPane.showMessageDialog(this, "Error when trying to open all cases:\n" + e.getMessage());
+        }
+        
+        
+    }
     
     private void openCase()
     {
@@ -1005,13 +1011,10 @@ public class startForm extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCloseCaseWindow;
     private javax.swing.JButton btnCreateCase;
+    private javax.swing.JButton btnListAllCases;
     private javax.swing.JButton btnOpenCase;
     private javax.swing.JButton btnReftresh;
-    private javax.swing.JButton btnReports;
     private javax.swing.JButton btnSaveCase;
-    private javax.swing.JButton btnSearchAssigne;
-    private javax.swing.JButton btnSearchCat;
-    private javax.swing.JButton btnSearchID;
     private javax.swing.JButton btnSearchStatus;
     private javax.swing.JComboBox comboAssigned;
     private javax.swing.JComboBox comboBoxCity;
