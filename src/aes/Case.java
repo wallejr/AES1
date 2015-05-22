@@ -44,6 +44,12 @@ public class Case
     {  
     }
     
+    public Case(int id, String created)
+    {  
+        setTilldeladTill(created);
+        setId(id);
+    }
+    
     
 
 
@@ -470,13 +476,15 @@ public class Case
             if (i > 0 )
             {
                 tempstring = getComments();
+                String empty = "";
                 
-                if (tempstring != null)
+                if (tempstring != null && !tempstring.equals(empty))
                 {
                    
-                    PreparedStatement commentStmt = cn.prepareStatement("INSERT INTO CASE_COMMENTS(COMMENTS, Timed, CASE_ID)" + "VALUES (?, ?, '"+getId()+"'");
+                    PreparedStatement commentStmt = cn.prepareStatement("INSERT INTO CASE_COMMENTS(COMMENTS, Timed, CASE_ID)" + "VALUES (?, ?, ?)");
                     commentStmt.setString(1, getComments());
                     commentStmt.setTimestamp(2, sqlAndradDate);
+                    commentStmt.setInt(3, getId());
 
 
                     int x = commentStmt.executeUpdate();
@@ -489,15 +497,12 @@ public class Case
                 
                 if(getSolution() != null && !getSolution().isEmpty())
                 {
-                    PreparedStatement solutionStmt = cn.prepareStatement("INSERT INTO CASE_SOLUTIONS(SOLUTION, Timed, CASE_ID)" + "VALUES(?, ?, '"+getId()+"'");
+                    PreparedStatement solutionStmt = cn.prepareStatement("INSERT INTO SOLUTIONS(SOLUTION, Timed, CASE_ID)" + "VALUES(?, ?, ?)");
                     solutionStmt.setString(1, getSolution());
-                    solutionStmt.setTimestamp(2, sqlStartDate);
+                    solutionStmt.setTimestamp(2, sqlAndradDate);
+                    solutionStmt.setInt(3, getId());
                     
-                    int x = solutionStmt.executeUpdate();
-                    if (x > 0)
-                    {
-                        succes = true;
-                    } //End inner, inner if, verifying solution insert success
+                    
                 }
                 
                 
@@ -557,11 +562,21 @@ public class Case
                 setBeraknadTid(rs.getInt("TIDBEREKNAD"));
                 setTidsAtgang(rs.getInt("TIDSLUTFORT"));
                 setTilldeladTill(rs.getString("ASSIGNE"));
-                setSolution(rs.getString("SOLUTION"));
                 setAvdelning(rs.getString("DEPARTMENT"));
                 setTidsAtgang(rs.getInt("TIDSLUTFORT"));
                 setKategori(rs.getString("KATEGORI"));
+                
+                
             }
+            
+            s ="select SOLUTION from SOLUTIONS where CASE_ID='"+getId()+"'";
+            stmt = cn.createStatement();
+            rs=stmt.executeQuery(s);
+            while(rs.next())
+            {
+                setSolution(rs.getString("SOLUTION"));
+            }
+            
             
             success = true;
             

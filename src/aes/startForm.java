@@ -655,6 +655,13 @@ public class startForm extends javax.swing.JFrame {
         });
 
         btnSearchStatus.setText("Search by Status");
+        btnSearchStatus.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                btnSearchStatusActionPerformed(evt);
+            }
+        });
 
         btnOpenCase.setText("Open Case");
         btnOpenCase.addActionListener(new java.awt.event.ActionListener()
@@ -791,6 +798,7 @@ public class startForm extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCreateCaseActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnCreateCaseActionPerformed
@@ -822,7 +830,7 @@ public class startForm extends javax.swing.JFrame {
     private void updateList() throws SQLException
     {
         
-        DefaultListModel m = new DefaultListModel();
+       // DefaultListModel m = new DefaultListModel();
         
         Connection conn = null;
         ResultSet rs = null;
@@ -876,23 +884,7 @@ public class startForm extends javax.swing.JFrame {
 
     private void comboCategoryItemStateChanged(java.awt.event.ItemEvent evt)//GEN-FIRST:event_comboCategoryItemStateChanged
     {//GEN-HEADEREND:event_comboCategoryItemStateChanged
-        String selected = comboCategory.getSelectedItem().toString();
 
-        switch(selected)
-        {
-            case "Network":
-            comboAssigned.setModel(new DefaultComboBoxModel<>(PersonalNetwork.values()));
-            break;
-            case "Security":
-            comboAssigned.setModel(new DefaultComboBoxModel<>(PersonalSecurity.values()));
-            break;
-            case "Installation":
-            comboAssigned.setModel(new DefaultComboBoxModel<>(PersonalInstallation.values()));
-            break;
-            case "Users":
-            comboAssigned.setModel(new DefaultComboBoxModel<>(PersonalUsers.values()));
-            break;
-        } //End
     }//GEN-LAST:event_comboCategoryItemStateChanged
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton1ActionPerformed
@@ -942,6 +934,12 @@ public class startForm extends javax.swing.JFrame {
 
 
     }//GEN-LAST:event_btnOpenCaseActionPerformed
+
+    private void btnSearchStatusActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnSearchStatusActionPerformed
+    {//GEN-HEADEREND:event_btnSearchStatusActionPerformed
+        searchByStatus status = new searchByStatus();
+        status.show();
+    }//GEN-LAST:event_btnSearchStatusActionPerformed
     
     private void openCase()
     {
@@ -955,6 +953,7 @@ public class startForm extends javax.swing.JFrame {
            
            dia.setCaseID(id);
            dia.openCase();
+           dia.updateTasksList(id);
            
            dia.setVisible(true);
            updateList();
@@ -962,10 +961,8 @@ public class startForm extends javax.swing.JFrame {
            
         } catch (Exception e)
         {
-            System.err.println("SQLException: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, e.getMessage());
         }
-       
-       
        
     }
     

@@ -1018,6 +1018,9 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Search by Status"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSearchStatusActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="btnOpenCase">
           <Properties>

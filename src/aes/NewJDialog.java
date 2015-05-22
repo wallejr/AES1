@@ -14,12 +14,17 @@ import aes.Enums.PersonalUsers;
 import aes.Enums.Status;
 
 import java.awt.HeadlessException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
+import net.proteanit.sql.DbUtils;
 
 /**
  *
@@ -35,7 +40,7 @@ public class NewJDialog extends javax.swing.JDialog
     private String avdelning;
     private String phoneNr;
     private int caseID;
-    private Case caset;
+    private Case caset = new Case();
     
     
     /**
@@ -77,6 +82,8 @@ public class NewJDialog extends javax.swing.JDialog
         comboStatus.setModel(new DefaultComboBoxModel<>(Status.values()));
         
         updateAssignedList();
+        
+        
     }
         
 
@@ -90,6 +97,8 @@ public class NewJDialog extends javax.swing.JDialog
     private void initComponents()
     {
 
+        workTaskList = new javax.swing.JScrollPane();
+        listWorkTask = new javax.swing.JList();
         panelCaseProperties = new javax.swing.JPanel();
         lblCaseId = new javax.swing.JLabel();
         txtCaseIdNr = new javax.swing.JTextField();
@@ -124,12 +133,14 @@ public class NewJDialog extends javax.swing.JDialog
         paneltextAreDesc = new javax.swing.JScrollPane();
         txtDescription = new javax.swing.JTextArea();
         panelWorkTask = new javax.swing.JPanel();
-        workTaskList = new javax.swing.JScrollPane();
-        listWorkTask = new javax.swing.JList();
+        btnAddTask = new javax.swing.JButton();
+        btnDelTask = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tblTasks = new javax.swing.JTable();
         panelComments = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         txtComments = new javax.swing.JTextArea();
-        jButton1 = new javax.swing.JButton();
+        btnComments = new javax.swing.JButton();
         panelTimeInfo = new javax.swing.JPanel();
         lblprefTime = new javax.swing.JLabel();
         txtFieldprelTime = new javax.swing.JTextField();
@@ -144,7 +155,17 @@ public class NewJDialog extends javax.swing.JDialog
         btnSaveCase = new javax.swing.JButton();
         btnCloseCaseWindow = new javax.swing.JButton();
 
+        listWorkTask.setBackground(new java.awt.Color(153, 153, 153));
+        listWorkTask.setModel(new javax.swing.AbstractListModel()
+        {
+            String[] strings = { "1. Ask if his collegues have the same issues", "2. Verify if local resources is accisable", "2. Ask user to thest with network cable plugged in", "3. Ask user to restart the computer", "If above doesn't work:", "1. Connect to switch and verify uptime" };
+            public int getSize() { return strings.length; }
+            public Object getElementAt(int i) { return strings[i]; }
+        });
+        workTaskList.setViewportView(listWorkTask);
+
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("CASE WINDOWS");
 
         panelCaseProperties.setBackground(new java.awt.Color(219, 219, 219));
         panelCaseProperties.setBorder(javax.swing.BorderFactory.createTitledBorder("Case Properties"));
@@ -284,42 +305,45 @@ public class NewJDialog extends javax.swing.JDialog
         panelCasePropertiesLayout.setHorizontalGroup(
             panelCasePropertiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelCasePropertiesLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lblCaseId)
-                .addGap(18, 18, 18)
-                .addComponent(txtCaseIdNr, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(43, 43, 43)
-                .addComponent(lblCreated)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtCreateDate, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(lblChanged)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtTimeChanged, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addGroup(panelCasePropertiesLayout.createSequentialGroup()
                 .addGroup(panelCasePropertiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelCasePropertiesLayout.createSequentialGroup()
+                    .addGroup(panelCasePropertiesLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(panelRequesterInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(238, 238, 238))
-                    .addGroup(panelCasePropertiesLayout.createSequentialGroup()
-                        .addComponent(lblCategory)
+                        .addComponent(lblCaseId)
+                        .addGap(18, 18, 18)
+                        .addComponent(txtCaseIdNr, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(43, 43, 43)
+                        .addComponent(lblCreated)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(comboCategory, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
-                .addGroup(panelCasePropertiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(panelCasePropertiesLayout.createSequentialGroup()
-                        .addComponent(lblAssignedTo)
+                        .addComponent(txtCreateDate, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(lblChanged)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(comboAssigned, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(txtTimeChanged, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(panelCasePropertiesLayout.createSequentialGroup()
+                        .addGroup(panelCasePropertiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelCasePropertiesLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(panelRequesterInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(238, 238, 238))
+                            .addGroup(panelCasePropertiesLayout.createSequentialGroup()
+                                .addComponent(lblCategory)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(comboCategory, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                         .addGroup(panelCasePropertiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(lblStatus)
-                            .addComponent(lblCreatedBy))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(panelCasePropertiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(txtFieldCreatedBy, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(comboStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                            .addGroup(panelCasePropertiesLayout.createSequentialGroup()
+                                .addComponent(lblAssignedTo)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(comboAssigned, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(panelCasePropertiesLayout.createSequentialGroup()
+                                .addGroup(panelCasePropertiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(lblStatus)
+                                    .addComponent(lblCreatedBy))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(panelCasePropertiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(txtFieldCreatedBy, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(comboStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                .addContainerGap(18, Short.MAX_VALUE))
         );
         panelCasePropertiesLayout.setVerticalGroup(
             panelCasePropertiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -390,27 +414,55 @@ public class NewJDialog extends javax.swing.JDialog
         panelWorkTask.setBackground(new java.awt.Color(219, 219, 219));
         panelWorkTask.setBorder(javax.swing.BorderFactory.createTitledBorder("Worktask"));
 
-        listWorkTask.setBackground(new java.awt.Color(153, 153, 153));
-        listWorkTask.setModel(new javax.swing.AbstractListModel()
+        btnAddTask.setText("Add Task");
+        btnAddTask.addActionListener(new java.awt.event.ActionListener()
         {
-            String[] strings = { "1. Ask if his collegues have the same issues", "2. Verify if local resources is accisable", "2. Ask user to thest with network cable plugged in", "3. Ask user to restart the computer", "If above doesn't work:", "1. Connect to switch and verify uptime" };
-            public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                btnAddTaskActionPerformed(evt);
+            }
         });
-        workTaskList.setViewportView(listWorkTask);
+
+        btnDelTask.setText("Delete task");
+
+        tblTasks.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][]
+            {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String []
+            {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane2.setViewportView(tblTasks);
 
         javax.swing.GroupLayout panelWorkTaskLayout = new javax.swing.GroupLayout(panelWorkTask);
         panelWorkTask.setLayout(panelWorkTaskLayout);
         panelWorkTaskLayout.setHorizontalGroup(
             panelWorkTaskLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(workTaskList)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelWorkTaskLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnDelTask, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnAddTask, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(359, 359, 359))
+            .addGroup(panelWorkTaskLayout.createSequentialGroup()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 355, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         panelWorkTaskLayout.setVerticalGroup(
             panelWorkTaskLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelWorkTaskLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(workTaskList, javax.swing.GroupLayout.PREFERRED_SIZE, 236, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 254, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(panelWorkTaskLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnAddTask)
+                    .addComponent(btnDelTask))
+                .addContainerGap())
         );
 
         panelComments.setBorder(javax.swing.BorderFactory.createTitledBorder("Comments"));
@@ -420,7 +472,14 @@ public class NewJDialog extends javax.swing.JDialog
         txtComments.setText("Enter some comments here\n");
         jScrollPane4.setViewportView(txtComments);
 
-        jButton1.setText("Read Comments");
+        btnComments.setText("Read Comments");
+        btnComments.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                btnCommentsActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout panelCommentsLayout = new javax.swing.GroupLayout(panelComments);
         panelComments.setLayout(panelCommentsLayout);
@@ -429,7 +488,7 @@ public class NewJDialog extends javax.swing.JDialog
             .addGroup(panelCommentsLayout.createSequentialGroup()
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 262, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton1)
+                .addComponent(btnComments)
                 .addContainerGap())
         );
         panelCommentsLayout.setVerticalGroup(
@@ -438,8 +497,8 @@ public class NewJDialog extends javax.swing.JDialog
                 .addGroup(panelCommentsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(panelCommentsLayout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jButton1))
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 97, Short.MAX_VALUE))
+                        .addComponent(btnComments))
+                    .addComponent(jScrollPane4))
                 .addContainerGap())
         );
 
@@ -474,7 +533,7 @@ public class NewJDialog extends javax.swing.JDialog
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelTimeInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(txtFieldprelTime, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE)
-                    .addComponent(txtFieldTimeTaken, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE))
+                    .addComponent(txtFieldTimeTaken))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelTimeInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblPrefhours)
@@ -516,8 +575,8 @@ public class NewJDialog extends javax.swing.JDialog
         panelSolutionLayout.setVerticalGroup(
             panelSolutionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelSolutionLayout.createSequentialGroup()
-                .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addComponent(jScrollPane6)
+                .addContainerGap())
         );
 
         panelSaveAndClose.setBackground(new java.awt.Color(219, 219, 219));
@@ -548,8 +607,9 @@ public class NewJDialog extends javax.swing.JDialog
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelSaveAndCloseLayout.createSequentialGroup()
                 .addGap(28, 28, 28)
                 .addComponent(btnSaveCase, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnCloseCaseWindow, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnCloseCaseWindow, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(55, Short.MAX_VALUE))
         );
         panelSaveAndCloseLayout.setVerticalGroup(
             panelSaveAndCloseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -565,26 +625,22 @@ public class NewJDialog extends javax.swing.JDialog
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(panelCaseRequest, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(8, 8, 8))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(panelComments, javax.swing.GroupLayout.PREFERRED_SIZE, 413, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(panelSolution, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(6, 6, 6)))
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(panelWorkTask, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(panelTimeInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 412, Short.MAX_VALUE)
+                        .addComponent(panelComments, javax.swing.GroupLayout.PREFERRED_SIZE, 413, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(panelSolution, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(panelTimeInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 384, Short.MAX_VALUE)
                             .addComponent(panelSaveAndClose, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(panelCaseProperties, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(panelCaseProperties, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(53, 53, 53)))
-                .addGap(91, 91, 91))
+                        .addComponent(panelCaseRequest, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(panelWorkTask, javax.swing.GroupLayout.PREFERRED_SIZE, 383, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -592,19 +648,17 @@ public class NewJDialog extends javax.swing.JDialog
                 .addComponent(panelCaseProperties, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(panelWorkTask, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(panelCaseRequest, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(panelCaseRequest, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(panelSolution, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(panelComments, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(panelWorkTask, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(panelTimeInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(panelSaveAndClose, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(156, Short.MAX_VALUE))
+                        .addComponent(panelSaveAndClose, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(panelSolution, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(panelComments, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -633,6 +687,27 @@ public class NewJDialog extends javax.swing.JDialog
     {//GEN-HEADEREND:event_btnCloseCaseWindowActionPerformed
        dispose();
     }//GEN-LAST:event_btnCloseCaseWindowActionPerformed
+
+    private void btnCommentsActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnCommentsActionPerformed
+    {//GEN-HEADEREND:event_btnCommentsActionPerformed
+        try
+        {
+            showComments com = new showComments(null, rootPaneCheckingEnabled);
+            com.setCaseID(getCaseID());
+            com.initList();
+            com.show();
+            
+        } catch (Exception e)
+        {
+            JOptionPane.showMessageDialog(this, e.getMessage());
+        }
+        
+    }//GEN-LAST:event_btnCommentsActionPerformed
+
+    private void btnAddTaskActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnAddTaskActionPerformed
+    {//GEN-HEADEREND:event_btnAddTaskActionPerformed
+        addCaseTask();// TODO add your handling code here:
+    }//GEN-LAST:event_btnAddTaskActionPerformed
     
     private void updateAssignedList()
     {
@@ -652,17 +727,80 @@ public class NewJDialog extends javax.swing.JDialog
             case "Users":
             comboAssigned.setModel(new DefaultComboBoxModel<>(PersonalUsers.values()));
             break;
-        } //End
+        } //End switch
         
         comboAssigned.insertItemAt("Not Assigned", 0);
         comboAssigned.setSelectedIndex(0);
     }
     
+    public void updateTasksList(int id) throws SQLException
+    {
+         Connection conn = null;
+        ResultSet rs = null;
+        PreparedStatement pst = null;
+        String DBURL = "jdbc:mysql://localhost:3306/AES?" +
+                "user=root&password=aik71111";
+        
+        
+        
+        try
+        {
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection(DBURL);
+            
+            String sql = "select TASK, CREATEDBY from workTasks where CASE_ID_FK= '"+id+"'";
+            pst = conn.prepareStatement(sql);
+            rs = pst.executeQuery();
+            
+            tblTasks.setModel(DbUtils.resultSetToTableModel(rs));
+            
+
+        }
+        catch(SQLException e)
+        {
+            
+        }
+        catch(ClassNotFoundException clExc)
+        {
+            System.err.println("ClassNotFoundException: " + clExc.getMessage());
+        }
+        finally
+        {
+            if (conn != null)
+                conn.close();
+        }
+        
+    }
+    
+    private void addCaseTask()
+    {
+        
+        try
+        {
+            AddTask tasks = new AddTask(null, rootPaneCheckingEnabled);
+//            caset.setCaseDesc(txtDescription.getText());
+            tasks.setCaseId(caset.getId());
+            tasks.setCreatedBy(caset.getTilldeladTill());
+            
+            tasks.initGUI();
+            tasks.setVisible(true);
+            
+            updateTasksList(caset.getId());
+            
+        } catch (Exception e)
+        {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
+        
+        
+    }
+    
+    
         //Metom som körs när användaren klickat på save case
     private void saveNewCase()
     { 
         
-        caset = new Case();
+//        caset = new Case();
         //DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Date date = new Date();
         boolean verify = false;
@@ -781,6 +919,7 @@ public class NewJDialog extends javax.swing.JDialog
                     {
                         throw new IllegalArgumentException("Please enter a solution and time taken");
                     }
+                    
                     else
                     {
                         
@@ -795,7 +934,8 @@ public class NewJDialog extends javax.swing.JDialog
                         caset.setTidsAtgang(Integer.parseInt(txtFieldTimeTaken.getText()));
                         caset.setTilldeladTill(comboAssigned.getSelectedItem().toString());
                         caset.setAvdelning(txtFieldAvd.getText());
-                        
+                        caset.setComments(txtComments.getText());
+                        caset.setSolution(txtsolution.getText());
                         caset.updateCase();
                         
                         {
@@ -816,7 +956,7 @@ public class NewJDialog extends javax.swing.JDialog
         }
         
         
-    }
+    }//End method saveUpdateCase
 
     
  
@@ -867,13 +1007,13 @@ public class NewJDialog extends javax.swing.JDialog
          }
          
          return success;
-     }
+     }//Exit method ValidateName
      
      public void openCase()
      {
          try
          {
-            caset = new Case();
+//            caset = new Case();
             caset.setId(getCaseID());
           
             caset.openCase();
@@ -891,6 +1031,7 @@ public class NewJDialog extends javax.swing.JDialog
             txtCreateDate.setText(caset.getSkapad().toString());
             txtTimeChanged.setText(caset.getAndrad().toString());
             comboCategory.setSelectedItem(Kompetens.valueOf(caset.getKategori()));
+            txtsolution.setText(caset.getSolution());
             
             Kompetens tempKomp = Kompetens.valueOf(caset.getKategori());
             
@@ -993,13 +1134,16 @@ public class NewJDialog extends javax.swing.JDialog
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAddTask;
     private javax.swing.JButton btnCloseCaseWindow;
+    private javax.swing.JButton btnComments;
+    private javax.swing.JButton btnDelTask;
     private javax.swing.JButton btnSaveCase;
     private javax.swing.JComboBox comboAssigned;
     private javax.swing.JComboBox comboBoxCity;
     private javax.swing.JComboBox comboCategory;
     private javax.swing.JComboBox comboStatus;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JLabel lblAssignedTo;
@@ -1030,6 +1174,7 @@ public class NewJDialog extends javax.swing.JDialog
     private javax.swing.JPanel panelTimeInfo;
     private javax.swing.JPanel panelWorkTask;
     private javax.swing.JScrollPane paneltextAreDesc;
+    private javax.swing.JTable tblTasks;
     private javax.swing.JTextField txtCaseIdNr;
     private javax.swing.JTextArea txtComments;
     private javax.swing.JTextField txtComputerName;
