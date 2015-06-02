@@ -791,9 +791,6 @@ public class startForm extends javax.swing.JFrame {
     private void btnCreateCaseActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnCreateCaseActionPerformed
     {//GEN-HEADEREND:event_btnCreateCaseActionPerformed
         callNewCaseDialog();
-        
-        
-        
     }//GEN-LAST:event_btnCreateCaseActionPerformed
 
     private void callNewCaseDialog()
@@ -810,21 +807,15 @@ public class startForm extends javax.swing.JFrame {
             System.err.println("SQLException: " + e.getMessage());
         }
         
-        
-        
-    }
+    }//End method callNewCaseDialog
     
     private void updateList() throws SQLException
     {
-        
-        
         Connection conn = null;
         ResultSet rs = null;
         PreparedStatement pst = null;
         String DBURL = "jdbc:mysql://localhost:3306/AES?" +
                 "user=root&password=aik71111";
-        
-        
         
         try
         {
@@ -835,8 +826,7 @@ public class startForm extends javax.swing.JFrame {
             pst = conn.prepareStatement(sql);
             rs = pst.executeQuery();
             tbleCases.setModel(DbUtils.resultSetToTableModel(rs));
-            
-
+           
         }
         catch(SQLException e)
         {
@@ -851,7 +841,7 @@ public class startForm extends javax.swing.JFrame {
             if (conn != null)
                 conn.close();
         }
-    }
+    }//End method updateList
     
     private void formWindowClosing(java.awt.event.WindowEvent evt)//GEN-FIRST:event_formWindowClosing
     {//GEN-HEADEREND:event_formWindowClosing
@@ -904,11 +894,8 @@ public class startForm extends javax.swing.JFrame {
     private void btnOpenCaseActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnOpenCaseActionPerformed
     {//GEN-HEADEREND:event_btnOpenCaseActionPerformed
         
-        
        if (tbleCases.getSelectedRow() >= 0 )
        {
-           
-           
            openCase();
        }
        else

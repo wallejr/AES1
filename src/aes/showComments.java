@@ -67,7 +67,7 @@ public class showComments extends javax.swing.JDialog
             ResultSet results = pst.executeQuery(sql);
             while (results.next())
             {
-                String comments = results.getString("Timed") + "\n" + results.getString("COMMENTS") + "\n\n";
+                String comments = results.getString("Timed") + "\n" + results.getString("COMMENTS");
                 
                 model.addElement(comments);
                 

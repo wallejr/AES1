@@ -13,14 +13,12 @@ import aes.Enums.PersonalSecurity;
 import aes.Enums.PersonalUsers;
 import aes.Enums.Status;
 
-import java.awt.HeadlessException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+
 import java.util.Date;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
@@ -41,6 +39,7 @@ public class NewJDialog extends javax.swing.JDialog
     private String phoneNr;
     private int caseID;
     private Case caset = new Case();
+    private CaseManager manager;
     
     
     /**
@@ -51,6 +50,14 @@ public class NewJDialog extends javax.swing.JDialog
         super(parent, modal);
         initComponents();
         initGUI();
+        try
+        {
+            
+            updateTasksList(0);
+        } catch (Exception e)
+        {
+        }
+        
     }
     
     
@@ -81,6 +88,8 @@ public class NewJDialog extends javax.swing.JDialog
         comboCategory.setModel(new DefaultComboBoxModel<>(Kompetens.values()));
         comboStatus.setModel(new DefaultComboBoxModel<>(Status.values()));
         
+        
+        
         updateAssignedList();
         
         
@@ -97,8 +106,6 @@ public class NewJDialog extends javax.swing.JDialog
     private void initComponents()
     {
 
-        workTaskList = new javax.swing.JScrollPane();
-        listWorkTask = new javax.swing.JList();
         panelCaseProperties = new javax.swing.JPanel();
         lblCaseId = new javax.swing.JLabel();
         txtCaseIdNr = new javax.swing.JTextField();
@@ -154,15 +161,6 @@ public class NewJDialog extends javax.swing.JDialog
         panelSaveAndClose = new javax.swing.JPanel();
         btnSaveCase = new javax.swing.JButton();
         btnCloseCaseWindow = new javax.swing.JButton();
-
-        listWorkTask.setBackground(new java.awt.Color(153, 153, 153));
-        listWorkTask.setModel(new javax.swing.AbstractListModel()
-        {
-            String[] strings = { "1. Ask if his collegues have the same issues", "2. Verify if local resources is accisable", "2. Ask user to thest with network cable plugged in", "3. Ask user to restart the computer", "If above doesn't work:", "1. Connect to switch and verify uptime" };
-            public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
-        });
-        workTaskList.setViewportView(listWorkTask);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("CASE WINDOWS");
@@ -424,6 +422,13 @@ public class NewJDialog extends javax.swing.JDialog
         });
 
         btnDelTask.setText("Delete task");
+        btnDelTask.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                btnDelTaskActionPerformed(evt);
+            }
+        });
 
         tblTasks.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][]
@@ -438,6 +443,7 @@ public class NewJDialog extends javax.swing.JDialog
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tblTasks.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane2.setViewportView(tblTasks);
 
         javax.swing.GroupLayout panelWorkTaskLayout = new javax.swing.GroupLayout(panelWorkTask);
@@ -708,6 +714,33 @@ public class NewJDialog extends javax.swing.JDialog
     {//GEN-HEADEREND:event_btnAddTaskActionPerformed
         addCaseTask();// TODO add your handling code here:
     }//GEN-LAST:event_btnAddTaskActionPerformed
+
+    private void btnDelTaskActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnDelTaskActionPerformed
+    {//GEN-HEADEREND:event_btnDelTaskActionPerformed
+        deleteTask();
+    }//GEN-LAST:event_btnDelTaskActionPerformed
+    
+    private void deleteTask()
+    {
+        WorkTasks wt = new WorkTasks();
+        if (tblTasks.getSelectedRow() > 0)
+        {
+            try
+            {
+               String task = tblTasks.getValueAt(tblTasks.getSelectedRow(), 0).toString();
+
+               wt.deleteWorkTask(task); 
+                updateTasksList(caset.getId());
+            } catch (Exception e)
+            {
+                JOptionPane.showMessageDialog(null, "There was an error trying to delete task!\n" + e.getMessage());
+            }
+        }//End if
+        else
+            JOptionPane.showMessageDialog(null, "Please select a task to remove");
+        
+        
+    }
     
     private void updateAssignedList()
     {
@@ -735,7 +768,7 @@ public class NewJDialog extends javax.swing.JDialog
         
         comboAssigned.insertItemAt("Not Assigned", 0);
         comboAssigned.setSelectedIndex(0);
-    }
+    }// End method dupdateAssignedList
     
     public void updateTasksList(int id) throws SQLException
     {
@@ -757,7 +790,6 @@ public class NewJDialog extends javax.swing.JDialog
             rs = pst.executeQuery();
             
             tblTasks.setModel(DbUtils.resultSetToTableModel(rs));
-            
 
         }
         catch(SQLException e)
@@ -774,59 +806,52 @@ public class NewJDialog extends javax.swing.JDialog
                 conn.close();
         }
         
-    }
+    } //End method updateTaskList
     
     private void addCaseTask()
     {
-        
-        try
+        if(!txtCaseIdNr.getText().equals(""))
         {
-            AddTask tasks = new AddTask(null, rootPaneCheckingEnabled);
-//            caset.setCaseDesc(txtDescription.getText());
-            tasks.setCaseId(caset.getId());
-            tasks.setCreatedBy(caset.getTilldeladTill());
-            
-            tasks.initGUI();
-            tasks.setVisible(true);
-            
-            updateTasksList(caset.getId());
-            
-        } catch (Exception e)
-        {
-            JOptionPane.showMessageDialog(null, e.getMessage());
-        }
+            try
+            {
+                AddTask tasks = new AddTask(null, rootPaneCheckingEnabled);
+    
+                tasks.setCaseId(caset.getId());
+                tasks.setCreatedBy(caset.getTilldeladTill());
+
+                tasks.initGUI();
+                tasks.setVisible(true);
+
+                updateTasksList(caset.getId());
+
+            } catch (Exception e)
+            {
+                JOptionPane.showMessageDialog(null, e.getMessage());
+            }
+        }//End fi
+        else
+            JOptionPane.showMessageDialog(this, "You must save the case before entering any tasks");
         
-        
-    }
+    }//End of method addCaseTask
     
     
         //Metom som körs när användaren klickat på save case
     private void saveNewCase()
     { 
         
-//        caset = new Case();
-        //DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+
         Date date = new Date();
         boolean verify = false;
+        manager = new CaseManager();
 
         try
         {
             
-        
             if (validateName())
             {
                 if (validatePhoneNr())
                 {
-                    
-                    
                     int selectedAssigned = comboAssigned.getSelectedIndex();
-                    
-
-
-
-                    JOptionPane.showMessageDialog(null, "Hi, its correct");
-                    
-
                     
                     caset.setBestallareAnvNamn(userName);
                     caset.setBestallareFullNamn(fullName);
@@ -844,8 +869,6 @@ public class NewJDialog extends javax.swing.JDialog
                     caset.setComments(txtComments.getText());
                     caset.setAvdelning(txtFieldAvd.getText());
                     caset.setTidsAtgang(Integer.parseInt(txtFieldTimeTaken.getText()));
-                    
-                   
                     
                     if (comboStatus.getSelectedItem().equals(Status.Assigned) && selectedAssigned == 0 )
                     {
@@ -866,9 +889,9 @@ public class NewJDialog extends javax.swing.JDialog
                         }
                         else
                         {
-                            if (caset.addCase() == true)
+                            if (manager.addCase(caset) == true)
                             {
-
+                                JOptionPane.showMessageDialog(null, "Case created");
                             }
                             else
                             {
@@ -877,41 +900,27 @@ public class NewJDialog extends javax.swing.JDialog
                         } //End inner if else verify textFieldCreatedBy
                         
                     } 
-                    catch (SQLException | HeadlessException ex)
+                    catch (Exception ex)
                     {
                         JOptionPane.showMessageDialog(this, "FEL!\n" + ex.getMessage());
+                        
                     }
-
-
-                    
-                    //verify = true;
-                    
-                    
                     dispose();
-                }
-              
-                
-                
+                }  
             }//end if Validatename
-            
-           
         }
         catch (IllegalArgumentException argEx)
         {
             JOptionPane.showMessageDialog(this, argEx.getMessage());
-        }
-        //}while(!verify);
-        
-         
-        
-        
-        
+        }  
     }//Slut på metoden saveCase
+    
     
     private void saveUpdateCase()
     {
         
         Date date = new Date();
+        manager = new CaseManager();
         
         try
         {
@@ -919,11 +928,14 @@ public class NewJDialog extends javax.swing.JDialog
             {
                 if (validatePhoneNr())
                 {
-                    if (comboStatus.getSelectedItem().equals(Status.Closed) && txtsolution.getText().isEmpty() && txtFieldTimeTaken.getText().isEmpty())
+                    if (comboStatus.getSelectedItem().equals(Status.Closed) && txtsolution.getText().isEmpty())
                     {
                         throw new IllegalArgumentException("Please enter a solution and time taken");
                     }
-                    
+                    else if (comboStatus.getSelectedItem().equals(Status.Assigned) && comboAssigned.getSelectedItem().equals("Not Assigned"))
+                    {
+                        throw new IllegalArgumentException("Please choose a person to assigne the case");
+                    }
                     else
                     {
                         
@@ -940,7 +952,8 @@ public class NewJDialog extends javax.swing.JDialog
                         caset.setAvdelning(txtFieldAvd.getText());
                         caset.setComments(txtComments.getText());
                         caset.setSolution(txtsolution.getText());
-                        caset.updateCase();
+                        
+                        manager.updateCase(caset);
                         
                         {
                             dispose();
@@ -956,10 +969,8 @@ public class NewJDialog extends javax.swing.JDialog
             
         } catch (Exception e)
         {
-            JOptionPane.showMessageDialog(this, e.getMessage());
+            JOptionPane.showMessageDialog(this, "Input Error: \n" + e.getMessage());
         }
-        
-        
     }//End method saveUpdateCase
 
     
@@ -1017,7 +1028,6 @@ public class NewJDialog extends javax.swing.JDialog
      {
          try
          {
-//            caset = new Case();
             caset.setId(getCaseID());
           
             caset.openCase();
@@ -1059,28 +1069,18 @@ public class NewJDialog extends javax.swing.JDialog
 
                 }
             }
-            
-            
-            
             if (comboStatus.getSelectedItem().equals(Status.Closed))
             {
                 txtFieldTimeTaken.setText(Integer.toString(caset.getTidsAtgang()));
                 txtsolution.setText(caset.getSolution());
-            }
-            
-            
-            
-            
+            } 
             
          } 
          catch (Exception e)
          {
              JOptionPane.showMessageDialog(this, e.getMessage());
          }
-         
-         
-         
-     }
+     } //End method openCAse
 
     
     /**
@@ -1168,7 +1168,6 @@ public class NewJDialog extends javax.swing.JDialog
     private javax.swing.JLabel lblTitle1;
     private javax.swing.JLabel lblUsername;
     private javax.swing.JLabel lblprefTime;
-    private javax.swing.JList listWorkTask;
     private javax.swing.JPanel panelCaseProperties;
     private javax.swing.JPanel panelCaseRequest;
     private javax.swing.JPanel panelComments;
@@ -1194,7 +1193,6 @@ public class NewJDialog extends javax.swing.JDialog
     private javax.swing.JTextField txtUserName;
     private javax.swing.JTextField txtphone;
     private javax.swing.JTextArea txtsolution;
-    private javax.swing.JScrollPane workTaskList;
     // End of variables declaration//GEN-END:variables
 
     /**
